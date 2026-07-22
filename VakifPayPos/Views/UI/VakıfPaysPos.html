@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VakıfPayPos - Market & Onboarding Simülatörü</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons for Beautiful UI -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Leaflet.js Map CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .step-active {
+            color: #0F172A;
+            border-color: #FFC20E;
+        }
+        /* Leaflet Harita boyutu */
+        #map {
+            height: 320px;
+            border-radius: 0.75rem;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- BİLDİRİM / TOAST ALANI -->
+    <div id="toast-container" class="fixed top-5 right-5 z-[9999] pointer-events-none flex flex-col gap-3"></div>
+
+    <!-- HEADER -->
+    <header class="bg-white border-b-4 border-[#FFC20E] sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-[#0F172A] text-[#FFC20E] p-2.5 rounded-xl flex items-center justify-center shadow-md border border-[#FFC20E]/20">
+                    <i class="fa-solid fa-credit-card text-2xl"></i>
+                </div>
+                <div>
+                    <span class="font-extrabold text-2xl tracking-tight text-[#0F172A]">Vakıf<span class="text-[#FFC20E] bg-[#0F172A] px-2 py-0.5 rounded ml-1">PayPos</span></span>
+                    <span class="block text-[10px] text-slate-500 font-extrabold uppercase tracking-widest mt-0.5">Kurumsal Ödeme Çözümleri</span>
+                </div>
+            </div>
+            
+            <!-- Adımları Gösteren Progress Bar -->
+            <div class="hidden md:flex items-center space-x-6 text-xs font-bold">
+                <span id="nav-step-1" class="step-active flex items-center space-x-2 border-b-2 pb-1 border-[#FFC20E]">
+                    <span class="w-6 h-6 rounded-full bg-[#0F172A] text-[#FFC20E] flex items-center justify-center shadow-sm font-extrabold">1</span>
+                    <span>Cihaz Seçimi</span>
+                </span>
+                <i class="fa-solid fa-chevron-right text-slate-300"></i>
+                <span id="nav-step-2" class="text-slate-400 flex items-center space-x-2 pb-1">
+                    <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center">2</span>
+                    <span>Başvuru & Evraklar</span>
+                </span>
+                <i class="fa-solid fa-chevron-right text-slate-300"></i>
+                <span id="nav-step-3" class="text-slate-400 flex items-center space-x-2 pb-1">
+                    <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center">3</span>
+                    <span>Özet & Ödeme</span>
+                </span>
+            </div>
+
+            <!-- Sağ Taraf: Sepet Özeti -->
+            <div class="flex items-center space-x-4">
+                <button onclick="toggleCartModal()" class="relative p-2.5 text-[#0F172A] hover:text-[#FFC20E] hover:bg-[#0F172A] transition-all focus:outline-none bg-slate-100 rounded-xl">
+                    <i class="fa-solid fa-basket-shopping text-xl"></i>
+                    <span id="cart-badge" class="absolute -top-1 -right-1 bg-[#FFC20E] text-[#0F172A] text-[11px] font-extrabold rounded-full w-5 h-5 flex items-center justify-center shadow border-2 border-white hidden">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+        
+        <!-- STEP 1: CİHAZ KATALOĞU -->
+        <section id="step-1" class="space-y-8 animate-fade-in">
+            <div class="text-center max-w-2xl mx-auto space-y-3">
+                <span class="bg-[#FFC20E]/15 text-[#0F172A] text-xs font-extrabold px-3 py-1 rounded-full border border-[#FFC20E]/30 uppercase tracking-widest">VakıfPayPos Ürün Portföyü</span>
+                <h1 class="text-3xl font-extrabold tracking-tight text-[#0F172A] sm:text-4xl">Yeni Nesil Fiziki POS Modelleri</h1>
+                <p class="text-slate-500 text-sm sm:text-base">Geniş cihaz yelpazemiz ile VakıfBank güvencesinde, avantajlı komisyon oranlarıyla birden fazla cihazı sepetinize ekleyerek ortak havuz oluşturun.</p>
+            </div>
+
+            <!-- Gelişmiş Filtreleme Paneli -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-wrap gap-4 items-center justify-between shadow-sm">
+                <div class="flex items-center space-x-3">
+                    <span class="text-xs font-bold text-[#0F172A] uppercase tracking-wider">Cihaz Tipi Filtresi:</span>
+                    <select id="sector-filter" onchange="filterProducts()" class="bg-slate-50 border border-slate-200 rounded-lg text-sm px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#FFC20E] font-semibold text-[#0F172A]">
+                        <option value="all">Tüm Cihaz Tipleri</option>
+                        <option value="sabit">Sabit POS</option>
+                        <option value="mobil">Mobil POS</option>
+                        <option value="okc">Yazarkasa ÖKC</option>
+                        <option value="vuk507">VUK 507 Entegre</option>
+                    </select>
+                </div>
+                <div class="text-xs text-slate-500 font-medium">
+                    <i class="fa-solid fa-circle-info mr-1 text-[#FFC20E]"></i> VakıfBank güvencesiyle 7/24 kesintisiz takas ve mutabakat desteği.
+                </div>
+            </div>
+
+            <!-- Ürün Listesi Grid -->
+            <div id="product-grid" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Sabit POS -->
+                <div class="product-card bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between" data-sector="sabit">
+                    <div class="p-6">
+                        <div class="h-40 w-full bg-slate-50 rounded-xl flex items-center justify-center mb-4 border border-slate-100 p-4">
+                            <svg class="h-28 w-auto" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="25" y="10" width="50" height="80" rx="8" fill="#0F172A"/>
+                                <rect x="30" y="15" width="40" height="25" rx="4" fill="#1e293b"/>
+                                <rect x="32" y="17" width="36" height="21" rx="2" fill="#FFC20E" fill-opacity="0.2"/>
+                                <text x="50" y="30" fill="#FFC20E" font-size="6" font-weight="bold" text-anchor="middle">SABİT POS</text>
+                                <circle cx="50" cy="50" r="8" fill="#475569"/>
+                                <rect x="30" y="65" width="10" height="6" rx="1" fill="#475569"/>
+                                <rect x="45" y="65" width="10" height="6" rx="1" fill="#475569"/>
+                                <rect x="60" y="65" width="10" height="6" rx="1" fill="#475569"/>
+                                <rect x="30" y="75" width="10" height="6" rx="1" fill="#475569"/>
+                                <rect x="45" y="75" width="10" height="6" rx="1" fill="#e2e8f0"/>
+                                <rect x="60" y="75" width="10" height="6" rx="1" fill="#FFC20E"/>
+                            </svg>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="text-[10px] font-extrabold text-[#0F172A] bg-amber-100 px-2.5 py-0.5 rounded-full border border-[#FFC20E]/50">Sabit POS</span>
+                            <h3 class="text-base font-bold text-slate-900">VakıfClassic Sabit</h3>
+                            <p class="text-slate-500 text-xs line-clamp-2">Kablolu ve Ethernet bağlantılı, her ölçekteki tezgah üstü kasaya uygun standart POS.</p>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 gap-2 text-[11px]">
+                            <div class="text-slate-500">Komisyon: <span class="text-slate-800 font-bold">%1.45</span></div>
+                            <div class="text-slate-500">Valör: <span class="text-slate-800 font-bold">Ertesi Gün</span></div>
+                        </div>
+                    </div>
+                    <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] text-slate-400 block font-semibold">Aylık Kiralama</span>
+                            <span class="text-base font-bold text-[#0F172A]">149 TL</span>
+                        </div>
+                        <button onclick="addToCart('payclassic', 'VakıfClassic Sabit', 149, 1.45, 'Ertesi Gün', 'Sabit POS', false)" class="bg-[#0F172A] hover:bg-slate-800 text-[#FFC20E] text-[11px] font-extrabold px-3.5 py-2.5 rounded-xl transition-all shadow-sm">
+                            Sepete Ekle
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobil POS -->
+                <div class="product-card bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between" data-sector="mobil">
+                    <div class="p-6">
+                        <div class="h-40 w-full bg-slate-50 rounded-xl flex items-center justify-center mb-4 border border-slate-100 p-4">
+                            <svg class="h-28 w-auto" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="28" y="5" width="44" height="90" rx="6" fill="#0F172A"/>
+                                <rect x="32" y="9" width="36" height="40" rx="3" fill="#1e293b"/>
+                                <text x="50" y="28" fill="#FFC20E" font-size="5" font-weight="bold" text-anchor="middle">MOBİL GPRS</text>
+                                <path d="M40 60 L60 60 M40 68 L60 68" stroke="#cbd5e1" stroke-width="2"/>
+                                <rect x="32" y="78" width="10" height="8" rx="1" fill="#475569"/>
+                                <rect x="45" y="78" width="10" height="8" rx="1" fill="#475569"/>
+                                <rect x="58" y="78" width="10" height="8" rx="1" fill="#FFC20E"/>
+                            </svg>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="text-[10px] font-extrabold text-[#0F172A] bg-amber-100 px-2.5 py-0.5 rounded-full border border-[#FFC20E]/50">Mobil POS</span>
+                            <h3 class="text-base font-bold text-slate-900">VakıfGPRS Seyyar Mobil</h3>
+                            <p class="text-slate-500 text-xs line-clamp-2">Dahili SIM kart desteğiyle saha ödemeleri, teslimat ve mobil işletmeler için ideal.</p>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 gap-2 text-[11px]">
+                            <div class="text-slate-500">Komisyon: <span class="text-slate-800 font-bold">%1.65</span></div>
+                            <div class="text-slate-500">Valör: <span class="text-slate-800 font-bold">Aynı Gün</span></div>
+                        </div>
+                    </div>
+                    <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] text-slate-400 block font-semibold">Aylık Kiralama</span>
+                            <span class="text-base font-bold text-[#0F172A]">199 TL</span>
+                        </div>
+                        <button onclick="addToCart('paysmart', 'VakıfGPRS Seyyar Mobil', 199, 1.65, 'Aynı Gün', 'Mobil POS', false)" class="bg-[#0F172A] hover:bg-slate-800 text-[#FFC20E] text-[11px] font-extrabold px-3.5 py-2.5 rounded-xl transition-all shadow-sm">
+                            Sepete Ekle
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Yazarkasa ÖKC -->
+                <div class="product-card bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between" data-sector="okc">
+                    <div class="p-6">
+                        <div class="h-40 w-full bg-slate-50 rounded-xl flex items-center justify-center mb-4 border border-slate-100 p-4">
+                            <svg class="h-28 w-auto" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="22" y="10" width="56" height="80" rx="4" fill="#0F172A"/>
+                                <rect x="26" y="14" width="48" height="24" rx="2" fill="#1e293b"/>
+                                <text x="50" y="28" fill="#FFC20E" font-size="6" font-weight="bold" text-anchor="middle">YAZARKASA ÖKC</text>
+                                <rect x="28" y="45" width="8" height="8" rx="1" fill="#334155"/>
+                                <rect x="39" y="45" width="8" height="8" rx="1" fill="#334155"/>
+                                <rect x="50" y="45" width="8" height="8" rx="1" fill="#334155"/>
+                                <rect x="61" y="45" width="11" height="8" rx="1" fill="#FFC20E"/>
+                                <rect x="28" y="58" width="8" height="8" rx="1" fill="#334155"/>
+                                <rect x="39" y="58" width="8" height="8" rx="1" fill="#334155"/>
+                                <rect x="50" y="58" width="8" height="8" rx="1" fill="#334155"/>
+                                <rect x="61" y="58" width="11" height="18" rx="1" fill="#ef4444"/>
+                                <rect x="28" y="70" width="19" height="12" rx="1" fill="#1e293b"/>
+                                <rect x="50" y="70" width="8" height="12" rx="1" fill="#FFC20E"/>
+                            </svg>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="text-[10px] font-extrabold text-[#0F172A] bg-amber-100 px-2.5 py-0.5 rounded-full border border-[#FFC20E]/50">Yazarkasa ÖKC</span>
+                            <h3 class="text-base font-bold text-slate-900">VakıfÖKC Pro-300</h3>
+                            <p class="text-slate-500 text-xs line-clamp-2">Gelir İdaresi Başkanlığı onaylı, fiş kesebilen mali mühürlü yeni nesil akıllı yazar kasa POS.</p>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 gap-2 text-[11px]">
+                            <div class="text-slate-500">Komisyon: <span class="text-slate-800 font-bold">%1.35</span></div>
+                            <div class="text-slate-500">Valör: <span class="text-slate-800 font-bold">2 İş Günü</span></div>
+                        </div>
+                    </div>
+                    <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] text-slate-400 block font-semibold">Satın Al / Peşin</span>
+                            <span class="text-base font-bold text-[#0F172A]">3.490 TL</span>
+                        </div>
+                        <button onclick="addToCart('paystore', 'VakıfÖKC Pro-300', 3490, 1.35, '2 İş Günü', 'Yazarkasa ÖKC', true)" class="bg-[#0F172A] hover:bg-slate-800 text-[#FFC20E] text-[11px] font-extrabold px-3.5 py-2.5 rounded-xl transition-all shadow-sm">
+                            Sepete Ekle
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VUK 507 Uyumlu Entegre POS -->
+                <div class="product-card bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between" data-sector="vuk507">
+                    <div class="p-6">
+                        <div class="h-40 w-full bg-slate-50 rounded-xl flex items-center justify-center mb-4 border border-slate-100 p-4">
+                            <svg class="h-28 w-auto" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="20" y="5" width="60" height="90" rx="8" fill="#0F172A"/>
+                                <rect x="25" y="10" width="50" height="45" rx="4" fill="#1e293b"/>
+                                <text x="50" y="32" fill="#FFC20E" font-size="5" font-weight="bold" text-anchor="middle">VUK 507 ENTEGRE</text>
+                                <text x="50" y="42" fill="#94a3b8" font-size="4" text-anchor="middle">Dijital Fatura</text>
+                                <circle cx="50" cy="70" r="10" fill="#FFC20E"/>
+                                <rect x="25" y="85" width="50" height="4" rx="1" fill="#312e81"/>
+                            </svg>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="text-[10px] font-extrabold text-[#0F172A] bg-amber-100 px-2.5 py-0.5 rounded-full border border-[#FFC20E]/50">VUK 507 Entegre</span>
+                            <h3 class="text-base font-bold text-slate-900">VakıfSecure 507</h3>
+                            <p class="text-slate-500 text-xs line-clamp-2">VUK 507 tebliğine uyumlu, e-arşiv ve bilgi fişlerini güvenli entegrasyonla buluta iletir.</p>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 gap-2 text-[11px]">
+                            <div class="text-slate-500">Komisyon: <span class="text-slate-800 font-bold">%1.20</span></div>
+                            <div class="text-slate-500">Valör: <span class="text-slate-800 font-bold">Ertesi Gün</span></div>
+                        </div>
+                    </div>
+                    <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] text-slate-400 block font-semibold">Satın Al / Peşin</span>
+                            <span class="text-base font-bold text-[#0F172A]">4.190 TL</span>
+                        </div>
+                        <button onclick="addToCart('paysecure', 'VakıfSecure 507', 4190, 1.20, 'Ertesi Gün', 'VUK 507 Entegre', true)" class="bg-[#0F172A] hover:bg-slate-800 text-[#FFC20E] text-[11px] font-extrabold px-3.5 py-2.5 rounded-xl transition-all shadow-sm">
+                            Sepete Ekle
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 2: GELİŞMİŞ ONBOARDING / BAŞVURU FORMU (TAB-BASED) -->
+        <section id="step-2" class="hidden max-w-5xl mx-auto space-y-8 animate-fade-in">
+            <div class="text-center space-y-2">
+                <h2 class="text-2xl font-extrabold tracking-tight text-[#0F172A]">Gelişmiş Üye İşyeri Başvuru Formu</h2>
+                <p class="text-slate-500 text-sm">Cihaz kurulumu, yasal lisans onayları ve hakediş transferleriniz için aşağıdaki sekmeleri sırasıyla tamamlayınız.</p>
+            </div>
+
+            <!-- Seçilen Cihazlar Özeti -->
+            <div class="bg-amber-50/75 border border-[#FFC20E]/30 rounded-xl p-5 space-y-3">
+                <div class="flex items-center space-x-2 text-[#0F172A] font-bold text-sm">
+                    <i class="fa-solid fa-cart-flatbed-suitcase text-[#FFC20E] bg-[#0F172A] p-1.5 rounded-md"></i>
+                    <span>Talep Edilen Cihazlar</span>
+                </div>
+                <div id="onboarding-devices-list" class="divide-y divide-[#FFC20E]/20 text-xs text-slate-700">
+                    <!-- Dinamik doldurulacak -->
+                </div>
+                <div class="pt-2 flex justify-between items-center text-sm font-bold text-[#0F172A] border-t border-[#FFC20E]/20">
+                    <span>Toplam Başvuru Tutarı</span>
+                    <span id="onboarding-total-price" class="text-lg text-[#0F172A]">0.00 TL</span>
+                </div>
+            </div>
+
+            <!-- SEKMELİ YAPI (TABS NAVIGATION) -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                
+                <!-- Tab Başlık Butonları -->
+                <div class="flex flex-wrap border-b border-slate-200 bg-slate-50/50">
+                    <button type="button" id="tab-btn-1" onclick="switchOnboardingTab(1)" class="flex-1 min-w-[120px] py-4 px-2 text-center border-b-4 border-[#FFC20E] text-[#0F172A] font-extrabold text-xs sm:text-sm bg-amber-50/30 transition-all flex items-center justify-center space-x-2">
+                        <span class="w-5 h-5 rounded-full bg-[#0F172A] text-[#FFC20E] text-[10px] flex items-center justify-center font-black">1</span>
+                        <span>Şirket & Yetkili</span>
+                    </button>
+                    <button type="button" id="tab-btn-2" onclick="switchOnboardingTab(2)" class="flex-1 min-w-[120px] py-4 px-2 text-center border-b-2 border-slate-200 text-slate-400 hover:text-slate-600 font-bold text-xs sm:text-sm transition-all flex items-center justify-center space-x-2">
+                        <span class="w-5 h-5 rounded-full bg-slate-300 text-slate-600 text-[10px] flex items-center justify-center font-black">2</span>
+                        <span>İletişim & Konum</span>
+                    </button>
+                    <button type="button" id="tab-btn-3" onclick="switchOnboardingTab(3)" class="flex-1 min-w-[120px] py-4 px-2 text-center border-b-2 border-slate-200 text-slate-400 hover:text-slate-600 font-bold text-xs sm:text-sm transition-all flex items-center justify-center space-x-2">
+                        <span class="w-5 h-5 rounded-full bg-slate-300 text-slate-600 text-[10px] flex items-center justify-center font-black">3</span>
+                        <span>İşletme Hacmi</span>
+                    </button>
+                    <button type="button" id="tab-btn-4" onclick="switchOnboardingTab(4)" class="flex-1 min-w-[120px] py-4 px-2 text-center border-b-2 border-slate-200 text-slate-400 hover:text-slate-600 font-bold text-xs sm:text-sm transition-all flex items-center justify-center space-x-2">
+                        <span class="w-5 h-5 rounded-full bg-slate-300 text-slate-600 text-[10px] flex items-center justify-center font-black">4</span>
+                        <span>Yasal Belgeler</span>
+                    </button>
+                </div>
+
+                <!-- ANA FORM ELEMENTİ -->
+                <form id="onboarding-form" onsubmit="handleOnboardingSubmit(event)" class="divide-y divide-slate-100">
+                    
+                    <!-- TAB PANEL 1: Kurumsal & Kimlik Bilgileri -->
+                    <div id="onboarding-tab-panel-1" class="p-6 sm:p-8 space-y-6">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <h3 class="font-extrabold text-[#0F172A] text-base flex items-center space-x-2">
+                                <i class="fa-solid fa-id-card text-[#FFC20E]"></i>
+                                <span>Şirket Kurulum & Kimlik Detayları</span>
+                            </h3>
+                            <div class="flex items-center space-x-2 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                                <button type="button" id="type-corp-btn" onclick="setMerchantType('corp')" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-[#0F172A] text-[#FFC20E] transition-all">Kurumsal Üye İşyeri</button>
+                                <button type="button" id="type-ind-btn" onclick="setMerchantType('ind')" class="px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 hover:bg-white transition-all">Bireysel Üye İşyeri</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Firma Adı veya Ad Soyad -->
+                            <div class="space-y-1.5 md:col-span-2">
+                                <label id="lbl-company-name" class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Firma Adı (Ticari Unvan) <span class="text-rose-500">*</span></label>
+                                <input type="text" required id="merchant-name" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FFC20E]">
+                            </div>
+
+                            <!-- Vergi No / TCKN -->
+                            <div class="space-y-1.5">
+                                <label id="lbl-tax-number" class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Vergi Numarası <span class="text-rose-500">*</span></label>
+                                <input type="text" required id="tax-number" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FFC20E]">
+                            </div>
+
+                            <!-- Vergi Dairesi -->
+                            <div class="space-y-1.5" id="tax-office-container">
+                                <label class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Vergi Dairesi <span class="text-rose-500">*</span></label>
+                                <input type="text" id="tax-office" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FFC20E]">
+                            </div>
+
+                            <!-- Yetkili/Yönetici Ad Soyad -->
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Yetkili / Yönetici Ad Soyad <span class="text-rose-500">*</span></label>
+                                <input type="text" required id="manager-name" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FFC20E]">
+                            </div>
+
+                            <!-- Yetkili TCKN -->
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Yetkili TCKN <span class="text-rose-500">*</span></label>
+                                <input type="text" required id="manager-tckn" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FFC20E]">
+                            </div>
+                        </div>
+
+                        <!-- Sekme Yönlendirme Butonları -->
+                        <div class="flex justify-end pt-4 border-t border-slate-100">
+                            <button type="button" onclick="switchOnboardingTab(2)" class="bg-[#0F172A] hover:bg-slate-800 text-[#FFC20E] text-xs font-extrabold px-5 py-2.5 rounded-xl flex items-center space-x-2 transition-all shadow-sm">
+                                <span>İletişim & Konum Bilgilerine İlerle</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TAB PANEL 2: İletişim, Adres & Coğrafi Konum -->
+                    <div id="onboarding-tab-panel-2" class="p-6 sm:p-8 space-y-6 hidden">
+                        <div class="border-b border-slate-100 pb-3">
+                            <h3 class="font-extrabold text-[#0F172A] text-base flex items-center space-x-2">
+                                <i class="fa-solid fa-map-location-dot text-[#FFC20E]"></i>
+                                <span>İletişim, Adres & Coğrafi Konum Bilgileri</span>
+                            </h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Telefon -->
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Cep / İş Telefonu <span class="text-rose-500">*</span></label>
+                                <input type="tel" required id="phone" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FFC20E]">
+                            </div>
+
+                            <!-- E-posta -->
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">E-posta Adresi <span class="text-rose-500">*</span></label>
+                                <input type="email" required id="email" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FFC20E]">
+                            </div>
+
+                            <!-- Web -->
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Web Adresi</label>
+                                <input type="url" id="web-address" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FFC20E]">
+                            </div>
+
+                            <!-- İl -->
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">İl <span class="text-rose-500">*</span></label>
+                                <input type="text" required id="city" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FFC20E]">
+                            </div>
+
+                            <!-- İlçe -->
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">İlçe <span class="text-rose-500">*</span></label>
+                                <input type="text" required id="district" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FFC20E]">
+                            </div>
+
+                            <!-- Hakediş IBAN -->
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Hakediş IBAN Numarası <span class="text-rose-500">*</span></label>
+                                <input type="text" required id="iban" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FFC20E]">
+                            </div>
+
+                            <!-- Açık Adres -->
+                            <div class="space-y-1.5 md:col-span-3">
+                                <label class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Açık Adres <span class="text-rose-500">*</span></label>
+                                <textarea required id="address" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FFC20E]"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Harita Entegrasyon Bölümü -->
+                        <div class="border-t border-slate-100 pt-6 space-y-4">
+                            <div>
+                                <h4 class="text-sm font-bold text-[#0F172A] flex items-center space-x-1.5">
+                                    <i class="fa-solid fa-map-pin text-[#FFC20E]"></i>
+                                    <span>Haritada Konum Seçimi</span>
+                                </h4>
+                                <p class="text-xs text-slate-400">POS kurulum koordinat doğrulaması için işletme konumunuzu haritada tıklayarak işaretleyin.</p>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="md:col-span-2">
+                                    <div id="map" class="border border-slate-200 shadow-inner"></div>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-xl flex flex-col justify-between space-y-4 border border-slate-100">
+                                    <div class="space-y-3">
+                                        <div class="space-y-1">
+                                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">İşaretlenen Enlem</span>
+                                            <input type="text" readonly required id="lat-coord" class="w-full bg-white border border-slate-200 rounded-lg text-sm px-3 py-2 font-mono font-semibold text-[#0F172A]">
+                                        </div>
+                                        <div class="space-y-1">
+                                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">İşaretlenen Boylam</span>
+                                            <input type="text" readonly required id="lng-coord" class="w-full bg-white border border-slate-200 rounded-lg text-sm px-3 py-2 font-mono font-semibold text-[#0F172A]">
+                                        </div>
+                                    </div>
+                                    <div class="text-[11px] text-slate-500">
+                                        Koordinat tespiti, takas mutabakatındaki güvenlik ve şüpheli konum (Geo-blocking) risk kontrollerinde kullanılır.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sekme Yönlendirme Butonları -->
+                        <div class="flex justify-between pt-4 border-t border-slate-100">
+                            <button type="button" onclick="switchOnboardingTab(1)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold px-5 py-2.5 rounded-xl flex items-center space-x-2 transition-all">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                <span>Geri Dön</span>
+                            </button>
+                            <button type="button" onclick="switchOnboardingTab(3)" class="bg-[#0F172A] hover:bg-slate-800 text-[#FFC20E] text-xs font-extrabold px-5 py-2.5 rounded-xl flex items-center space-x-2 transition-all shadow-sm">
+                                <span>İşletme Detaylarına İlerle</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TAB PANEL 3: İşletme Hacmi & Limitler -->
+                    <div id="onboarding-tab-panel-3" class="p-6 sm:p-8 space-y-6 hidden">
+                        <div class="border-b border-slate-100 pb-3">
+                            <h3 class="font-extrabold text-[#0F172A] text-base flex items-center space-x-2">
+                                <i class="fa-solid fa-chart-line text-[#FFC20E]"></i>
+                                <span>İşletme Detayları & Finansal Limitler</span>
+                            </h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- İş Kategorisi -->
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">İş Kategorisi (Sektör) <span class="text-rose-500">*</span></label>
+                                <select id="business-category" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FFC20E] text-slate-700 font-semibold">
+                                    <option value="Yiyecek & Restoran">Yiyecek & Restoran (MCC: 5812)</option>
+                                    <option value="Perakende Mağazacılık">Perakende Mağazacılık (MCC: 5411)</option>
+                                    <option value="Akaryakıt İstasyonu">Akaryakıt İstasyonu (MCC: 5541)</option>
+                                    <option value="Hizmet Sektörü">Hizmet Sektörü (MCC: 7230)</option>
+                                    <option value="Teknoloji & Yazılım">Teknoloji & Yazılım (MCC: 5734)</option>
+                                </select>
+                            </div>
+
+                            <!-- Tahmini Aylık Ciro -->
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Tahmini Aylık Ciro (TL) <span class="text-rose-500">*</span></label>
+                                <select id="monthly-turnover" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FFC20E] text-slate-700 font-semibold">
+                                    <option value="0 - 50.000 TL">0 - 50.000 TL</option>
+                                    <option value="50.000 - 250.000 TL" selected>50.000 - 250.000 TL</option>
+                                    <option value="250.000 - 1.000.000 TL">250.000 - 1.000.000 TL</option>
+                                    <option value="1.000.000 TL+">1.000.000 TL ve Üzeri</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Sekme Yönlendirme Butonları -->
+                        <div class="flex justify-between pt-4 border-t border-slate-100">
+                            <button type="button" onclick="switchOnboardingTab(2)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold px-5 py-2.5 rounded-xl flex items-center space-x-2 transition-all">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                <span>Geri Dön</span>
+                            </button>
+                            <button type="button" onclick="switchOnboardingTab(4)" class="bg-[#0F172A] hover:bg-slate-800 text-[#FFC20E] text-xs font-extrabold px-5 py-2.5 rounded-xl flex items-center space-x-2 transition-all shadow-sm">
+                                <span>Yasal Evraklara İlerle</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TAB PANEL 4: Yasal Evraklar & Belgeler -->
+                    <div id="onboarding-tab-panel-4" class="p-6 sm:p-8 space-y-6 hidden">
+                        <div class="border-b border-slate-100 pb-3">
+                            <h3 class="font-extrabold text-[#0F172A] text-base flex items-center space-x-2">
+                                <i class="fa-solid fa-file-shield text-[#FFC20E]"></i>
+                                <span>Yasal Evrak & Doküman Yükleme Bölümü</span>
+                            </h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Evrak 1 -->
+                            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between shadow-sm">
+                                <div class="space-y-1">
+                                    <h4 class="text-xs font-bold text-slate-700">Vergi Levhası <span class="text-rose-500">*</span></h4>
+                                    <p class="text-[10px] text-slate-400">PDF, PNG veya JPEG (Maks. 5MB)</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span id="badge-vergi" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 font-semibold">Yüklenmedi</span>
+                                    <button type="button" onclick="simulateUpload('vergi')" class="text-xs bg-[#0F172A]/10 text-[#0F172A] hover:bg-[#0F172A]/20 px-3 py-1.5 rounded-lg font-bold transition-all"><i class="fa-solid fa-cloud-arrow-up mr-1 text-[#FFC20E]"></i>Yükle</button>
+                                </div>
+                            </div>
+                            <!-- Evrak 2 -->
+                            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between shadow-sm">
+                                <div class="space-y-1">
+                                    <h4 class="text-xs font-bold text-slate-700">İmza Sirküleri <span class="text-rose-500" id="sirku-required">*</span></h4>
+                                    <p class="text-[10px] text-slate-400">Noter onaylı imza sirküsü</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span id="badge-sirku" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 font-semibold">Yüklenmedi</span>
+                                    <button type="button" onclick="simulateUpload('sirku')" class="text-xs bg-[#0F172A]/10 text-[#0F172A] hover:bg-[#0F172A]/20 px-3 py-1.5 rounded-lg font-bold transition-all"><i class="fa-solid fa-cloud-arrow-up mr-1 text-[#FFC20E]"></i>Yükle</button>
+                                </div>
+                            </div>
+                            <!-- Evrak 3 -->
+                            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between shadow-sm">
+                                <div class="space-y-1">
+                                    <h4 class="text-xs font-bold text-slate-700">Ticaret Sicil Gazetesi <span class="text-rose-500" id="gazete-required">*</span></h4>
+                                    <p class="text-[10px] text-slate-400">Kuruluş Gazetesi veya Pay Cetveli</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span id="badge-gazete" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 font-semibold">Yüklenmedi</span>
+                                    <button type="button" onclick="simulateUpload('gazete')" class="text-xs bg-[#0F172A]/10 text-[#0F172A] hover:bg-[#0F172A]/20 px-3 py-1.5 rounded-lg font-bold transition-all"><i class="fa-solid fa-cloud-arrow-up mr-1 text-[#FFC20E]"></i>Yükle</button>
+                                </div>
+                            </div>
+                            <!-- Evrak 4 -->
+                            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between shadow-sm">
+                                <div class="space-y-1">
+                                    <h4 class="text-xs font-bold text-slate-700">Kimlik Görseli (Yetkili) <span class="text-rose-500">*</span></h4>
+                                    <p class="text-[10px] text-slate-400">Ön ve arka yüz taraması</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span id="badge-kimlik" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 font-semibold">Yüklenmedi</span>
+                                    <button type="button" onclick="simulateUpload('kimlik')" class="text-xs bg-[#0F172A]/10 text-[#0F172A] hover:bg-[#0F172A]/20 px-3 py-1.5 rounded-lg font-bold transition-all"><i class="fa-solid fa-cloud-arrow-up mr-1 text-[#FFC20E]"></i>Yükle</button>
+                                </div>
+                            </div>
+                            <!-- Evrak 5 -->
+                            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between md:col-span-2 shadow-sm">
+                                <div class="space-y-1">
+                                    <h4 class="text-xs font-bold text-slate-700">Üye İşyeri Sözleşmesi <span class="text-rose-500">*</span></h4>
+                                    <p class="text-[10px] text-slate-400">İmzalı çerçeve sözleşme sayfaları</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span id="badge-sozlesme" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 font-semibold">Yüklenmedi</span>
+                                    <button type="button" onclick="simulateUpload('sozlesme')" class="text-xs bg-[#0F172A]/10 text-[#0F172A] hover:bg-[#0F172A]/20 px-3 py-1.5 rounded-lg font-bold transition-all"><i class="fa-solid fa-cloud-arrow-up mr-1 text-[#FFC20E]"></i>Yükle</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Yükleme İlerleme Simülatörü (Progress Bar) -->
+                        <div id="upload-progress-container" class="hidden bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-2">
+                            <div class="flex items-center justify-between text-xs">
+                                <span id="progress-file-name" class="font-medium text-slate-600">Dosya yükleniyor...</span>
+                                <span id="progress-percentage" class="font-bold text-[#0F172A]">0%</span>
+                            </div>
+                            <div class="w-full bg-slate-200 rounded-full h-2">
+                                <div id="progress-bar-fill" class="bg-[#FFC20E] h-2 rounded-full transition-all duration-100" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Sekme Yönlendirme Butonları -->
+                        <div class="flex justify-between pt-4 border-t border-slate-100">
+                            <button type="button" onclick="switchOnboardingTab(3)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold px-5 py-2.5 rounded-xl flex items-center space-x-2 transition-all">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                <span>Geri Dön</span>
+                            </button>
+                            <span class="text-slate-400 text-xs italic self-center hidden sm:inline"><i class="fa-solid fa-lock text-[#FFC20E] mr-1"></i> Tüm evraklar 256-bit şifrelenir.</span>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Onay ve Mevzuat Kabul Bölümü -->
+            <div class="bg-amber-50 border border-[#FFC20E]/30 rounded-2xl p-6 flex items-start space-x-3 shadow-sm">
+                <input type="checkbox" required form="onboarding-form" class="mt-1 h-4 w-4 rounded border-amber-300 text-[#0F172A] focus:ring-[#FFC20E]">
+                <div class="text-xs text-amber-900 space-y-1">
+                    <p class="font-bold">Önemli Hukuki ve Mali Uyarı</p>
+                    <p>Yukarıda beyan edilen tüm bilgiler ve yüklenen evrakların doğruluğunu kabul ediyorum. Yanıltıcı beyanların takas hakedişlerinin dondurulmasına sebep olacağını ve GİB/TCMB mevzuatlarına göre işlem yapılacağını onaylıyorum.</p>
+                </div>
+            </div>
+
+            <!-- Form Alt Alanı Butonlar -->
+            <div class="px-6 py-4 bg-white border border-slate-200 rounded-2xl flex items-center justify-between shadow-sm">
+                <button type="button" onclick="goToStep(1)" class="text-slate-600 hover:text-slate-900 font-bold text-xs flex items-center space-x-1.5">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Cihaz Seçimine Dön</span>
+                </button>
+                <button type="submit" form="onboarding-form" class="bg-[#0F172A] hover:bg-slate-800 text-[#FFC20E] text-xs font-extrabold px-6 py-2.5 rounded-lg transition-all shadow-sm flex items-center space-x-2 border border-[#FFC20E]/20">
+                    <span>Başvuruyu Tamamla & Ödeme Adımına Geç</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- STEP 3: ÖZET & ONAY & ÖDEME -->
+        <section id="step-3" class="hidden max-w-6xl mx-auto space-y-8 animate-fade-in">
+            <div class="text-center space-y-2">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#FFC20E]/15 text-[#0F172A] border border-[#FFC20E]/30 shadow-sm">
+                    <i class="fa-solid fa-shield-halved mr-1.5 text-[#FFC20E]"></i>
+                    Güvenli Tahsilat & Entegrasyon Ekranı
+                </span>
+                <h2 class="text-2xl font-extrabold tracking-tight text-[#0F172A]">Özet, Onay ve Ödeme Paneli</h2>
+                <p class="text-slate-500 text-sm">Başvurunuz başarıyla doğrulandı. Siparişinizi tamamlamak ve anında terminal aktivasyonu sağlamak için ödemeyi tamamlayınız.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- SOL 2 KOLON: Ödeme Formu ve Sipariş Detayları -->
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <!-- Sipariş ve Firma Bilgileri Özeti -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+                        <h3 class="text-base font-bold text-[#0F172A] border-b border-slate-100 pb-3 flex items-center space-x-2">
+                            <i class="fa-solid fa-file-invoice-dollar text-[#FFC20E] bg-[#0F172A] p-1 rounded-md"></i>
+                            <span>Sipariş ve Üye İşyeri Özeti</span>
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                            <div class="space-y-2">
+                                <div class="flex justify-between"><span class="text-slate-400">Firma Unvanı:</span> <span id="checkout-m-name" class="font-semibold text-slate-800">-</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Üye İşyeri Tipi:</span> <span id="checkout-m-type" class="font-semibold text-slate-800">-</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Vergi / TCKN:</span> <span id="checkout-m-tax" class="font-semibold text-slate-800 font-mono">-</span></div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between"><span class="text-slate-400">Hakediş IBAN:</span> <span id="checkout-m-iban" class="font-semibold text-slate-800 font-mono">-</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Kurulum Adresi:</span> <span id="checkout-m-address" class="font-semibold text-slate-800 text-right max-w-[200px] truncate">-</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Konum (Lat, Lng):</span> <span id="checkout-m-coords" class="font-semibold text-indigo-600 font-mono text-[10px]">-</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Cihaz Kalemleri Listesi -->
+                        <div class="border-t border-slate-100 pt-3 space-y-2">
+                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Teslim Edilecek & Kurulacak Cihazlar:</h4>
+                            <div id="checkout-devices-table" class="space-y-2 text-xs divide-y divide-slate-100">
+                                <!-- Dinamik -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kredi Kartı Ödeme Bölümü -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
+                        <h3 class="text-base font-bold text-[#0F172A] border-b border-slate-100 pb-3 flex items-center space-x-2">
+                            <i class="fa-solid fa-wallet text-[#FFC20E] bg-[#0F172A] p-1 rounded-md"></i>
+                            <span>Sanal POS ile Güvenli Ödeme</span>
+                        </h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                            
+                            <!-- İnteraktif Kart Görseli -->
+                            <div class="bg-gradient-to-br from-[#0F172A] via-[#1e293b] to-slate-900 rounded-2xl p-6 text-white h-48 flex flex-col justify-between shadow-lg relative overflow-hidden transition-all hover:scale-[1.02] border border-[#FFC20E]/20">
+                                <div class="absolute right-4 top-4 opacity-10 text-9xl"><i class="fa-solid fa-credit-card"></i></div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[10px] font-extrabold uppercase tracking-widest text-[#FFC20E]">VakıfBank Sanal POS</span>
+                                    <i id="card-icon" class="fa-brands fa-cc-visa text-3xl text-slate-200"></i>
+                                </div>
+                                <div class="space-y-1">
+                                    <span class="text-[9px] text-slate-400 block font-medium">KART NUMARASI</span>
+                                    <p id="preview-card-number" class="text-lg font-mono tracking-widest text-[#FFC20E]">•••• •••• •••• ••••</p>
+                                </div>
+                                <div class="flex justify-between text-xs font-mono">
+                                    <div>
+                                        <p class="text-[8px] text-slate-400">KART SAHİBİ</p>
+                                        <p id="preview-card-holder" class="font-semibold uppercase tracking-wide">AD SOYAD</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-[8px] text-slate-400">SKT</p>
+                                        <p id="preview-card-expiry" class="font-semibold">MM/YY</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Kredi Kartı Giriş Formu -->
+                            <div class="space-y-4">
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Kart Sahibi</label>
+                                    <input type="text" id="pay-holder" oninput="updateCardPreview()" placeholder="Kart Üzerindeki İsim" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-xs px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#FFC20E] font-medium">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Kart Numarası</label>
+                                    <input type="text" id="pay-number" maxlength="19" oninput="updateCardPreview(); formatCardNumber(this);" placeholder="0000 0000 0000 0000" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-xs px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#FFC20E] font-mono">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Son Kullanma (AA/YY)</label>
+                                        <input type="text" id="pay-expiry" maxlength="5" oninput="updateCardPreview(); formatExpiry(this);" placeholder="01/28" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-xs px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#FFC20E] font-mono">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">CVC / CVV</label>
+                                        <input type="password" id="pay-cvv" maxlength="3" placeholder="•••" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-xs px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#FFC20E] font-mono">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ödeme Gönderim Butonu -->
+                        <div class="border-t border-slate-100 pt-4 flex items-center justify-between font-bold">
+                            <div>
+                                <span class="text-[10px] text-slate-400 block font-medium">Ödenecek Toplam Tutar</span>
+                                <span id="checkout-total-price-button" class="text-xl text-[#0F172A]">0.00 TL</span>
+                            </div>
+                            <button id="btn-pay-and-activate" onclick="processCheckoutPayment()" class="bg-[#0F172A] hover:bg-slate-800 text-[#FFC20E] text-xs font-extrabold px-6 py-3 rounded-xl transition-all shadow-md flex items-center space-x-2 border border-[#FFC20E]/20">
+                                <i class="fa-solid fa-credit-card"></i>
+                                <span>Ödemeyi Güvenli Yap & Terminalleri Aç</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SAĞ 1 KOLON: Takas / Entegrasyon ve Terminal Logları -->
+                <div class="lg:col-span-1 space-y-6">
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between h-full space-y-6">
+                        
+                        <div class="space-y-4">
+                            <h3 class="text-sm font-bold text-[#0F172A] flex items-center space-x-2 border-b border-slate-100 pb-3">
+                                <span class="bg-[#0F172A]/10 text-[#0F172A] w-6 h-6 rounded-lg flex items-center justify-center text-xs"><i class="fa-solid fa-arrows-spin"></i></span>
+                                <span>Canlı Entegrasyon Terminali</span>
+                            </h3>
+
+                            <!-- Terminal Atamaları (Dinamik) -->
+                            <div class="space-y-3">
+                                <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tanımlanan Terminal ID'ler:</h4>
+                                <div id="checkout-terminal-badge-container" class="space-y-2">
+                                    <div class="text-xs text-slate-400 italic">Ödeme yapıldıktan sonra TMM tarafından otomatik MID/TID üretilecektir.</div>
+                                </div>
+                            </div>
+
+                            <!-- Konsol Log Ekranı -->
+                            <div class="space-y-2">
+                                <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Otomasyon Logları:</h4>
+                                <div id="sim-console" class="bg-slate-900 text-[#FFC20E] rounded-xl p-3 font-mono text-[10px] h-52 overflow-y-auto space-y-2 border border-slate-800">
+                                    <div class="text-slate-300">> [SİSTEM] Onboarding verileri doğrulandı. Ödeme talimatı bekleniyor...</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Finansal Havuz Bilgisi -->
+                        <div class="bg-slate-50 border border-slate-100 p-4 rounded-xl flex items-center justify-between text-xs shadow-inner">
+                            <span class="text-slate-500 font-bold">Gelen Test Havuzu:</span>
+                            <span id="clearing-pool" class="font-extrabold text-emerald-600 text-sm">0.00 TL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>&copy; 2026 VakıfPayPos - Türkiye Vakıflar Bankası T.A.O. | Stajyer Geliştirme Proje Modülü</p>
+        </div>
+    </footer>
+
+    <!-- SEPET MODALI -->
+    <div id="cart-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full border border-slate-200 shadow-2xl overflow-hidden animate-scale-up">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h3 class="text-base font-bold text-[#0F172A]">Alışveriş Sepeti</h3>
+                <button onclick="toggleCartModal()" class="text-slate-400 hover:text-slate-600 focus:outline-none"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <!-- Dinamik Sepet Ürünleri -->
+            <div class="p-6 space-y-4 max-h-96 overflow-y-auto" id="cart-items-wrapper">
+                <!-- Burası renderCart() tarafından doldurulacak -->
+            </div>
+
+            <!-- Sepet Özeti ve Buton -->
+            <div id="cart-footer" class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between hidden">
+                <div>
+                    <span class="text-[10px] text-slate-400 block font-bold">Toplam Tutar</span>
+                    <span id="cart-total-price" class="text-base font-extrabold text-[#0F172A]">0 TL</span>
+                </div>
+                <button onclick="proceedToOnboarding()" class="bg-[#0F172A] hover:bg-slate-800 text-[#FFC20E] text-xs font-extrabold px-4 py-2.5 rounded-lg shadow-sm transition-colors flex items-center space-x-1.5 border border-[#FFC20E]/20">
+                    <span>Onboarding Sürecine Geç</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Global State (Birden fazla cihaz eklenebilen yeni sepet yapısı)
+        let cart = [];
+        let merchantType = 'corp'; // 'corp' or 'ind'
+        let map = null;
+        let mapMarker = null;
+        let activeOnboardingTab = 1;
+
+        // Evrak Yükleme State
+        let docsState = {
+            vergi: false,
+            sirku: false,
+            gazete: false,
+            kimlik: false,
+            sozlesme: false
+        };
+
+        // Form Gönderildiğinde Tutulacak Bilgiler
+        let submittedData = {};
+
+        // Toast Bildirim Sistemi (Alert yerine kullanılmak üzere)
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `p-4 rounded-xl shadow-lg border text-xs font-bold flex items-center space-x-2 transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto`;
+            
+            if (type === 'error') {
+                toast.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-800');
+                toast.innerHTML = `<i class="fa-solid fa-circle-exclamation text-rose-500"></i> <span>${message}</span>`;
+            } else if (type === 'success') {
+                toast.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-800');
+                toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500"></i> <span>${message}</span>`;
+            } else {
+                toast.classList.add('bg-amber-50', 'border-[#FFC20E]/40', 'text-amber-900');
+                toast.innerHTML = `<i class="fa-solid fa-circle-info text-[#FFC20E]"></i> <span>${message}</span>`;
+            }
+
+            container.appendChild(toast);
+            
+            // Animation Trigger
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 50);
+
+            // Auto Remove
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 4000);
+        }
+
+        // Adım Yönetimi (Ana Sayfa Adımları)
+        function goToStep(stepNumber) {
+            document.getElementById('step-1').classList.add('hidden');
+            document.getElementById('step-2').classList.add('hidden');
+            document.getElementById('step-3').classList.add('hidden');
+
+            document.getElementById(`step-${stepNumber}`).classList.remove('hidden');
+
+            const steps = ['1', '2', '3'];
+            steps.forEach(num => {
+                const navEl = document.getElementById(`nav-step-${num}`);
+                if (parseInt(num) <= stepNumber) {
+                    navEl.className = "step-active flex items-center space-x-2 border-b-2 pb-1 border-[#FFC20E] text-[#0F172A]";
+                    const badge = navEl.querySelector('span');
+                    if(badge) {
+                        badge.className = "w-6 h-6 rounded-full bg-[#0F172A] text-[#FFC20E] flex items-center justify-center shadow-sm font-extrabold";
+                    }
+                } else {
+                    navEl.className = "text-slate-400 flex items-center space-x-2 pb-1";
+                    const badge = navEl.querySelector('span');
+                    if(badge) {
+                        badge.className = "w-6 h-6 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center";
+                    }
+                }
+            });
+
+            if (stepNumber === 2) {
+                switchOnboardingTab(1); // Onboarding her açıldığında 1. sekmeyle başlar
+            }
+        }
+
+        // Onboarding Sekme Yönetimi (Tabs)
+        function switchOnboardingTab(tabIndex) {
+            // Tüm sekmeleri gizle
+            document.getElementById('onboarding-tab-panel-1').classList.add('hidden');
+            document.getElementById('onboarding-tab-panel-2').classList.add('hidden');
+            document.getElementById('onboarding-tab-panel-3').classList.add('hidden');
+            document.getElementById('onboarding-tab-panel-4').classList.add('hidden');
+
+            // Hedef sekmeyi göster
+            document.getElementById(`onboarding-tab-panel-${tabIndex}`).classList.remove('hidden');
+
+            // Sekme buton stillerini güncelle
+            for (let i = 1; i <= 4; i++) {
+                const btn = document.getElementById(`tab-btn-${i}`);
+                const badge = btn.querySelector('span');
+                if (i === tabIndex) {
+                    btn.className = "flex-1 min-w-[120px] py-4 px-2 text-center border-b-4 border-[#FFC20E] text-[#0F172A] font-extrabold text-xs sm:text-sm bg-amber-50/30 transition-all flex items-center justify-center space-x-2";
+                    badge.className = "w-5 h-5 rounded-full bg-[#0F172A] text-[#FFC20E] text-[10px] flex items-center justify-center font-black shadow-sm";
+                } else {
+                    btn.className = "flex-1 min-w-[120px] py-4 px-2 text-center border-b-2 border-slate-200 text-slate-400 hover:text-slate-600 font-bold text-xs sm:text-sm transition-all flex items-center justify-center space-x-2 bg-white";
+                    badge.className = "w-5 h-5 rounded-full bg-slate-200 text-slate-500 text-[10px] flex items-center justify-center font-black";
+                }
+            }
+
+            activeOnboardingTab = tabIndex;
+
+            // Tab 2 ise haritayı yeniden boyutlandır
+            if (tabIndex === 2) {
+                setTimeout(initMap, 100);
+            }
+        }
+
+        // Ürün Filtreleme (Cihaz Tiplerine Göre)
+        function filterProducts() {
+            const selectedSector = document.getElementById('sector-filter').value;
+            const cards = document.querySelectorAll('.product-card');
+
+            cards.forEach(card => {
+                const sectors = card.getAttribute('data-sector').split(',');
+                if (selectedSector === 'all' || sectors.includes(selectedSector)) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
+        // Sepet Modalı Açma/Kapama
+        function toggleCartModal() {
+            const modal = document.getElementById('cart-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        // Çoklu Sepete Cihaz Ekleme
+        function addToCart(id, name, price, commissionRate, valor, deviceType, isPurchase = false) {
+            const existingItem = cart.find(item => item.id === id);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+                showToast(`${name} adet sayısı artırıldı (${existingItem.quantity} adet)`, 'info');
+            } else {
+                cart.push({
+                    id: id,
+                    name: name,
+                    price: price,
+                    rate: commissionRate,
+                    valor: valor,
+                    deviceType: deviceType,
+                    isPurchase: isPurchase,
+                    quantity: 1
+                });
+                showToast(`${name} sepetinize eklendi!`, 'success');
+            }
+
+            updateCartUI();
+        }
+
+        // Sepetten Ürün Silme / Adet Düşürme
+        function removeOneFromCart(id) {
+            const existingItem = cart.find(item => item.id === id);
+            if (existingItem) {
+                if (existingItem.quantity > 1) {
+                    existingItem.quantity -= 1;
+                } else {
+                    cart = cart.filter(item => item.id !== id);
+                }
+            }
+            updateCartUI();
+        }
+
+        function removeAllFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            updateCartUI();
+        }
+
+        function clearCart() {
+            cart = [];
+            updateCartUI();
+        }
+
+        // Sepet UI Güncellemesi
+        function updateCartUI() {
+            const wrapper = document.getElementById('cart-items-wrapper');
+            const badge = document.getElementById('cart-badge');
+            const footer = document.getElementById('cart-footer');
+            const totalPriceEl = document.getElementById('cart-total-price');
+
+            const totalQty = cart.reduce((acc, item) => acc + item.quantity, 0);
+            
+            if (totalQty > 0) {
+                badge.innerText = totalQty;
+                badge.classList.remove('hidden');
+                footer.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+                footer.classList.add('hidden');
+                wrapper.innerHTML = `
+                    <div class="text-center py-8 space-y-2">
+                        <i class="fa-solid fa-basket-shopping text-4xl text-slate-200"></i>
+                        <p class="text-sm text-slate-400">Sepetiniz şu anda boş.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div class="space-y-3">';
+            let grandTotal = 0;
+
+            cart.forEach(item => {
+                const subtotal = item.price * item.quantity;
+                grandTotal += subtotal;
+
+                html += `
+                    <div class="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-100 text-xs shadow-sm">
+                        <div class="space-y-1">
+                            <h4 class="font-extrabold text-[#0F172A]">${item.name}</h4>
+                            <p class="text-[10px] text-slate-400">
+                                Tip: <span class="text-slate-600 font-bold">${item.deviceType}</span> | Komisyon: %${item.rate}
+                            </p>
+                            <div class="flex items-center space-x-2 pt-1">
+                                <button onclick="removeOneFromCart('${item.id}')" class="bg-white border border-slate-200 hover:bg-slate-100 rounded px-1.5 py-0.5 text-[10px]"><i class="fa-solid fa-minus"></i></button>
+                                <span class="font-bold text-slate-700 font-mono">${item.quantity}</span>
+                                <button onclick="addToCart('${item.id}', '${item.name}', ${item.price}, ${item.rate}, '${item.valor}', '${item.deviceType}', ${item.isPurchase})" class="bg-white border border-slate-200 hover:bg-slate-100 rounded px-1.5 py-0.5 text-[10px]"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <div class="text-right flex flex-col justify-between h-full min-h-[50px]">
+                            <span class="font-extrabold text-[#0F172A]">${subtotal.toLocaleString('tr-TR')} TL</span>
+                            <button onclick="removeAllFromCart('${item.id}')" class="text-[10px] text-rose-500 hover:underline pt-2">Kaldır</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            wrapper.innerHTML = html;
+            totalPriceEl.innerText = grandTotal.toLocaleString('tr-TR') + " TL";
+        }
+
+        // Firma Tipi Değiştirici
+        function setMerchantType(type) {
+            merchantType = type;
+            const corpBtn = document.getElementById('type-corp-btn');
+            const indBtn = document.getElementById('type-ind-btn');
+
+            const lblCompanyName = document.getElementById('lbl-company-name');
+            const lblTaxNumber = document.getElementById('lbl-tax-number');
+
+            const sirkuReq = document.getElementById('sirku-required');
+            const gazeteReq = document.getElementById('gazete-required');
+
+            const taxOfficeContainer = document.getElementById('tax-office-container');
+
+            if (type === 'corp') {
+                corpBtn.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-[#0F172A] text-[#FFC20E] transition-all";
+                indBtn.className = "px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 hover:bg-white transition-all";
+
+                lblCompanyName.innerHTML = `Firma Adı (Ticari Unvan) <span class="text-rose-500">*</span>`;
+                lblTaxNumber.innerHTML = `Vergi Numarası <span class="text-rose-500">*</span>`;
+                document.getElementById('merchant-name').placeholder = "Örn: VakıfPayPos Test A.Ş.";
+                document.getElementById('tax-number').placeholder = "10 Haneli Vergi No";
+
+                sirkuReq.classList.remove('hidden');
+                gazeteReq.classList.remove('hidden');
+                taxOfficeContainer.classList.remove('hidden');
+            } else {
+                indBtn.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-[#0F172A] text-[#FFC20E] transition-all";
+                corpBtn.className = "px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 hover:bg-white transition-all";
+
+                lblCompanyName.innerHTML = `Üye İşyeri Sahibi (Ad Soyad) <span class="text-rose-500">*</span>`;
+                lblTaxNumber.innerHTML = `T.C. Kimlik Numarası (TCKN) <span class="text-rose-500">*</span>`;
+                document.getElementById('merchant-name').placeholder = "Örn: Canan Demir";
+                document.getElementById('tax-number').placeholder = "11 Haneli TCKN";
+
+                sirkuReq.classList.add('hidden');
+                gazeteReq.classList.add('hidden');
+                taxOfficeContainer.classList.add('hidden');
+            }
+        }
+
+        // Harita Başlatıcı (Leaflet OpenStreetMap)
+        function initMap() {
+            if (map !== null) {
+                map.invalidateSize();
+                return;
+            }
+
+            map = L.map('map').setView([41.015, 28.979], 10);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+
+            document.getElementById('lat-coord').value = "41.0151";
+            document.getElementById('lng-coord').value = "28.9795";
+
+            map.on('click', function(e) {
+                const lat = e.latlng.lat.toFixed(6);
+                const lng = e.latlng.lng.toFixed(6);
+
+                document.getElementById('lat-coord').value = lat;
+                document.getElementById('lng-coord').value = lng;
+
+                if (mapMarker) {
+                    mapMarker.setLatLng(e.latlng);
+                } else {
+                    mapMarker = L.marker(e.latlng).addTo(map);
+                }
+            });
+            
+            // Harita boyutunun tam render olması için tetikleme
+            map.invalidateSize();
+        }
+
+        // Onboarding Sürecine Geçiş
+        function proceedToOnboarding() {
+            if (cart.length === 0) {
+                showToast("Sepetiniz boş! Lütfen en az bir cihaz ekleyiniz.", "error");
+                return;
+            }
+            toggleCartModal();
+
+            // Onboarding sepet özet listesi
+            const container = document.getElementById('onboarding-devices-list');
+            let html = "";
+            let grandTotal = 0;
+
+            cart.forEach(item => {
+                const subtotal = item.price * item.quantity;
+                grandTotal += subtotal;
+                html += `
+                    <div class="flex justify-between py-2">
+                        <span class="font-semibold text-slate-600">${item.name} (${item.quantity} Adet)</span>
+                        <span class="font-bold text-[#0F172A]">${subtotal.toLocaleString('tr-TR')} TL ${item.isPurchase ? "" : "/ Ay"}</span>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            document.getElementById('onboarding-total-price').innerText = grandTotal.toLocaleString('tr-TR') + " TL";
+
+            // Hazır Mock Data doldurma (Kolay test)
+            document.getElementById('merchant-name').value = "VakıfPayPos Entegre Hizmetleri Ltd.";
+            document.getElementById('tax-number').value = "5812903829";
+            document.getElementById('tax-office').value = "Ataşehir Kurumlar V.D.";
+            document.getElementById('manager-name').value = "Ahmet Yılmaz";
+            document.getElementById('manager-tckn').value = "11122233344";
+            document.getElementById('phone').value = "0532 999 88 77";
+            document.getElementById('email').value = "onboarding@vakifpaypos.com.tr";
+            document.getElementById('web-address').value = "https://www.vakifpaypos.com.tr";
+            document.getElementById('city').value = "İstanbul";
+            document.getElementById('district').value = "Kadıköy";
+            document.getElementById('iban').value = "TR67 0001 5001 5800 0001 9827 34";
+            document.getElementById('address').value = "Kozyatağı Mah. Değirmen Sok. No: 12A, Kadıköy/İstanbul";
+
+            goToStep(2);
+        }
+
+        // Evrak Yükleme Simülasyonu
+        function simulateUpload(docType) {
+            const container = document.getElementById('upload-progress-container');
+            const fill = document.getElementById('progress-bar-fill');
+            const perc = document.getElementById('progress-percentage');
+            const name = document.getElementById('progress-file-name');
+
+            let filesLabels = {
+                vergi: "Vergi_Levhasi_2026.pdf",
+                sirku: "Imza_Sirkuleri_Mudur.pdf",
+                gazete: "Ticaret_Sicil_Gazetesi_Kurulus.pdf",
+                kimlik: "Kimlik_Fotokopisi_Mudur.png",
+                sozlesme: "Merchant_Sözlesmesi_Imzali.pdf"
+            };
+
+            container.classList.remove('hidden');
+            name.innerText = `${filesLabels[docType]} yükleniyor...`;
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                fill.style.width = progress + "%";
+                perc.innerText = progress + "%";
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        container.classList.add('hidden');
+                        
+                        // Badge güncelle
+                        const badge = document.getElementById(`badge-${docType}`);
+                        badge.innerText = "Yüklendi";
+                        badge.className = "text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold";
+
+                        docsState[docType] = true;
+                        showToast(`${filesLabels[docType]} başarıyla yüklendi.`, "success");
+                    }, 200);
+                }
+            }, 100);
+        }
+
+        // Form Onaylandığında (Özet & Ödeme ekranına geçiş)
+        function handleOnboardingSubmit(event) {
+            event.preventDefault();
+
+            // Tüm sekmelerdeki zorunlu evrak kontrolleri
+            if (merchantType === 'corp') {
+                if (!docsState.vergi || !docsState.sirku || !docsState.gazete || !docsState.kimlik || !docsState.sozlesme) {
+                    showToast("Lütfen 4. Sekmedeki kurumsal başvuru için gerekli tüm yasal evrakları yükleyiniz!", "error");
+                    switchOnboardingTab(4); // Belgelerin eksik olduğunu göstermek için o sekmeye yönlendir
+                    return;
+                }
+            } else {
+                if (!docsState.vergi || !docsState.kimlik || !docsState.sozlesme) {
+                    showToast("Lütfen 4. Sekmedeki bireysel üyelik için gerekli evrakları yükleyiniz!", "error");
+                    switchOnboardingTab(4);
+                    return;
+                }
+            }
+
+            // Form Verilerini Toplama
+            submittedData = {
+                merchantName: document.getElementById('merchant-name').value,
+                mType: merchantType === 'corp' ? "Kurumsal Şirket" : "Bireysel Üye",
+                taxNumber: document.getElementById('tax-number').value,
+                taxOffice: document.getElementById('tax-office').value,
+                managerName: document.getElementById('manager-name').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                category: document.getElementById('business-category').value,
+                turnover: document.getElementById('monthly-turnover').value,
+                lat: document.getElementById('lat-coord').value,
+                lng: document.getElementById('lng-coord').value,
+                address: document.getElementById('address').value,
+                iban: document.getElementById('iban').value
+            };
+
+            // Özet & Ödeme Bilgileri
+            document.getElementById('checkout-m-name').innerText = submittedData.merchantName;
+            document.getElementById('checkout-m-type').innerText = submittedData.mType;
+            document.getElementById('checkout-m-tax').innerText = submittedData.taxNumber;
+            document.getElementById('checkout-m-iban').innerText = submittedData.iban;
+            document.getElementById('checkout-m-address').innerText = submittedData.address;
+            document.getElementById('checkout-m-coords').innerText = `${submittedData.lat}, ${submittedData.lng}`;
+
+            // Cihaz Tablosunu Doldur
+            const tableContainer = document.getElementById('checkout-devices-table');
+            let tableHtml = "";
+            let totalAmount = 0;
+
+            cart.forEach(item => {
+                const subtotal = item.price * item.quantity;
+                totalAmount += subtotal;
+                tableHtml += `
+                    <div class="flex justify-between py-2 items-center">
+                        <div>
+                            <span class="font-bold text-slate-800 block">${item.name} (${item.quantity} Adet)</span>
+                            <span class="text-[10px] text-slate-400">Komisyon: %${item.rate} | Valör: ${item.valor}</span>
+                        </div>
+                        <span class="font-extrabold text-[#0F172A]">${subtotal.toLocaleString('tr-TR')} TL ${item.isPurchase ? "" : "/ Ay"}</span>
+                    </div>
+                `;
+            });
+
+            tableContainer.innerHTML = tableHtml;
+            document.getElementById('checkout-total-price-button').innerText = totalAmount.toLocaleString('tr-TR') + " TL";
+
+            // Default mock kart verisi (Kolay test için)
+            document.getElementById('pay-holder').value = "AHMET YILMAZ";
+            document.getElementById('pay-number').value = "5412 7500 0000 2026";
+            document.getElementById('pay-expiry').value = "09/28";
+            document.getElementById('pay-cvv').value = "312";
+            updateCardPreview();
+
+            // Konsol Hazırlığı
+            document.getElementById('clearing-pool').innerText = "0.00 TL";
+            document.getElementById('checkout-terminal-badge-container').innerHTML = `
+                <div class="text-xs text-slate-400 italic">Ödeme yapıldıktan sonra TMM tarafından otomatik MID/TID üretilecektir.</div>
+            `;
+            const consoleEl = document.getElementById('sim-console');
+            consoleEl.innerHTML = `
+                <div class="text-emerald-500 font-bold">> [SİSTEM] Onboarding verileri VakıfBank altyapısında doğrulandı.</div>
+                <div class="text-emerald-500">> [SİSTEM] Kurulum koordinat tespiti başarılı: ${submittedData.lat}, ${submittedData.lng}.</div>
+                <div class="text-amber-500 font-bold">> [Sanal POS] Toplam provizyon tutarı: ${totalAmount.toLocaleString('tr-TR')} TL. Ödeme onayı bekleniyor...</div>
+            `;
+
+            goToStep(3);
+        }
+
+        // Kredi Kartı İnteraktif Önizleme Güncellemesi
+        function updateCardPreview() {
+            const holder = document.getElementById('pay-holder').value;
+            const number = document.getElementById('pay-number').value;
+            const expiry = document.getElementById('pay-expiry').value;
+
+            document.getElementById('preview-card-holder').innerText = holder ? holder : "AD SOYAD";
+            document.getElementById('preview-card-number').innerText = number ? number : "•••• •••• •••• ••••";
+            document.getElementById('preview-card-expiry').innerText = expiry ? expiry : "MM/YY";
+
+            // Kart tipi belirleme
+            const cardIcon = document.getElementById('card-icon');
+            if (number.startsWith('5') || number.startsWith('2')) {
+                cardIcon.className = "fa-brands fa-cc-mastercard text-3xl text-orange-400";
+            } else if (number.startsWith('4')) {
+                cardIcon.className = "fa-brands fa-cc-visa text-3xl text-sky-400";
+            } else if (number.startsWith('3')) {
+                cardIcon.className = "fa-brands fa-cc-amex text-3xl text-emerald-400";
+            } else {
+                cardIcon.className = "fa-solid fa-credit-card text-3xl text-slate-200";
+            }
+        }
+
+        function formatCardNumber(input) {
+            let value = input.value.replace(/\D/g, '');
+            let formatted = value.match(/.{1,4}/g);
+            input.value = formatted ? formatted.join(' ') : value;
+        }
+
+        function formatExpiry(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                input.value = value.slice(0, 2) + '/' + value.slice(2, 4);
+            } else {
+                input.value = value;
+            }
+        }
+
+        // Sanal POS Ödeme Süreci, Aktivasyon & Test Siftah
+        function processCheckoutPayment() {
+            const holder = document.getElementById('pay-holder').value;
+            const number = document.getElementById('pay-number').value;
+            const expiry = document.getElementById('pay-expiry').value;
+            const cvv = document.getElementById('pay-cvv').value;
+
+            if (!holder || number.length < 16 || expiry.length < 5 || cvv.length < 3) {
+                showToast("Lütfen geçerli bir kredi kartı bilgisi giriniz!", "error");
+                return;
+            }
+
+            const btnPay = document.getElementById('btn-pay-and-activate');
+            btnPay.disabled = true;
+            btnPay.classList.add('opacity-50', 'cursor-not-allowed');
+            btnPay.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> <span>Provizyon Alınıyor...</span>`;
+
+            appendConsoleLog("> [Sanal POS] VakıfBank Ödeme Geçidi (Gateway) bağlantısı kuruluyor...", "text-slate-300");
+
+            setTimeout(() => {
+                appendConsoleLog("> [Sanal POS] 3D Secure doğrulaması yapıldı.", "text-slate-300");
+                appendConsoleLog("> [Sanal POS] Tahsilat Onaylandı! VakıfBank işlem referansı üretildi.", "text-emerald-500 font-bold");
+                showToast("Ödeme VakıfBank güvencesiyle tamamlandı!", "success");
+            }, 1500);
+
+            // TMM Tarafından Her Bir Cihaz İçin MID/TID Üretilmesi Simülasyonu
+            setTimeout(() => {
+                appendConsoleLog("> [SİSTEM] VakıfPayPos Terminal Yönetim Sistemi (TMM) tetiklendi...", "text-[#FFC20E] font-semibold");
+                
+                const badgeContainer = document.getElementById('checkout-terminal-badge-container');
+                badgeContainer.innerHTML = ""; // Temizle
+
+                const randomMID = "MID-VAKIF" + Math.floor(100000 + Math.random() * 900000);
+
+                cart.forEach((item, index) => {
+                    for(let i = 1; i <= item.quantity; i++) {
+                        const randomTID = "TID-V" + Math.floor(1000000 + Math.random() * 9000000);
+                        
+                        // Badge Ekle
+                        const div = document.createElement('div');
+                        div.className = "bg-slate-50 border border-slate-200 rounded-lg p-2 text-[10px] space-y-1 font-mono flex items-center justify-between shadow-sm";
+                        div.innerHTML = `
+                            <div>
+                                <span class="text-[#0F172A] font-extrabold block">${item.name} (${i})</span>
+                                <span class="text-slate-500 font-semibold">MID: ${randomMID}</span> | <span class="text-emerald-600 font-bold">TID: ${randomTID}</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[8px] font-extrabold border border-emerald-200">AKTİF</span>
+                        `;
+                        badgeContainer.appendChild(div);
+
+                        appendConsoleLog(`> [TMM] ${item.name} aktif edildi. MID: ${randomMID} | TID: ${randomTID}`, "text-slate-400");
+                    }
+                });
+            }, 3000);
+
+            // Siftah (0.01 TL Test İşlemi) ve Otomatik Takas/Clearing Simülasyonu
+            setTimeout(() => {
+                appendConsoleLog("> [TAKAS MOTORU] Entegre edilen terminaller için ilk test takas / siftah işlemi başlatılıyor...", "text-[#FFC20E] font-bold");
+                appendConsoleLog("> [TAKAS MOTORU] 0.01 TL'lik sanal test provizyon kartı temassız okutuldu.", "text-slate-300");
+            }, 5000);
+
+            setTimeout(() => {
+                const activeRate = cart[0].rate;
+                const grossAmount = 0.01;
+                const commission = (grossAmount * (activeRate / 100)).toFixed(4);
+                const netAmount = (grossAmount - commission).toFixed(4);
+
+                appendConsoleLog("> [PROVİZYON] Otorizasyon başarılı. Clearing batch dosyası paketleniyor.", "text-emerald-500");
+                appendConsoleLog(`> [TAKAS MUTABAKATI] Brüt: ${grossAmount} TL | VakıfBank Komisyonu (%${activeRate}): ${commission} TL`, "text-slate-400");
+                appendConsoleLog(`> [HAKEDİŞ TRANSFER] Net hakediş tutarı olan ${netAmount} TL, ${submittedData.iban} IBAN numarasına gönderilmek üzere EFT sırasına eklendi.`, "text-emerald-400 font-bold");
+                
+                // Havuz Bakiyesini Güncelle
+                document.getElementById('clearing-pool').innerText = "0.01 TL";
+                showToast("İlk takas mutabakat testi başarıyla tamamlandı!", "success");
+            }, 7000);
+
+            setTimeout(() => {
+                appendConsoleLog("> [VAKIFPAYPOS] Tebrikler, tüm fiziki terminallerin ve takas altyapısının kurulumu tamamlandı.", "text-[#FFC20E] font-bold");
+                
+                // Sıfırlama Butonunu Aktif Et
+                const btnFinish = document.getElementById('btn-finish-flow');
+                btnFinish.disabled = false;
+                btnFinish.classList.remove('bg-slate-100', 'text-slate-400', 'cursor-not-allowed');
+                btnFinish.classList.add('bg-emerald-600', 'hover:bg-emerald-700', 'text-white', 'shadow-md');
+
+                // Ödeme butonunu başarı sembolü yap
+                btnPay.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Aktivasyon Tamamlandı!</span>`;
+                btnPay.className = "bg-emerald-600 text-white text-xs font-extrabold px-6 py-3 rounded-xl shadow-md cursor-default flex items-center space-x-2";
+            }, 8500);
+        }
+
+        // Konsol Güncelleme Yardımcı Fonksiyonu
+        function appendConsoleLog(text, className) {
+            const consoleEl = document.getElementById('sim-console');
+            const logDiv = document.createElement('div');
+            logDiv.className = className;
+            logDiv.innerText = text;
+            consoleEl.appendChild(logDiv);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        // Sıfırlama ve Başlangıç Durumuna Dönme
+        function resetAll() {
+            cart = [];
+            clearCart();
+            docsState = { vergi: false, sirku: false, gazete: false, kimlik: false, sozlesme: false };
+            submittedData = {};
+
+            // Evrak durum badgelerini sıfırla
+            const docTypes = ['vergi', 'sirku', 'gazete', 'kimlik', 'sozlesme'];
+            docTypes.forEach(type => {
+                const badge = document.getElementById(`badge-${type}`);
+                if(badge) {
+                    badge.innerText = "Yüklenmedi";
+                    badge.className = "text-[10px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 font-semibold";
+                }
+            });
+
+            // Form ve Harita Sıfırlama
+            document.getElementById('onboarding-form').reset();
+            setMerchantType('corp');
+
+            // Butonları Sıfırla
+            const btnFinish = document.getElementById('btn-finish-flow');
+            btnFinish.disabled = true;
+            btnFinish.classList.add('bg-slate-100', 'text-slate-400', 'cursor-not-allowed');
+            btnFinish.classList.remove('bg-emerald-600', 'hover:bg-emerald-700', 'text-white', 'shadow-md');
+
+            const btnPay = document.getElementById('btn-pay-and-activate');
+            btnPay.disabled = false;
+            btnPay.className = "bg-[#0F172A] hover:bg-slate-800 text-[#FFC20E] text-xs font-extrabold px-6 py-3 rounded-xl transition-all shadow-md flex items-center space-x-2 border border-[#FFC20E]/20";
+            btnPay.innerHTML = `<i class="fa-solid fa-credit-card"></i> <span>Ödemeyi Güvenli Yap & Terminalleri Aç</span>`;
+
+            goToStep(1);
+        }
+    </script>
+</body>
+</html>
