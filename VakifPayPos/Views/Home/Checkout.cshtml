@@ -1,0 +1,113 @@
+@{
+    ViewData["Title"] = "Özet ve Ödeme";
+}
+
+<div class="max-w-5xl mx-auto space-y-6">
+    <div class="text-center space-y-2">
+        <h2 class="text-2xl font-extrabold text-[#0F172A]">Güvenli Ödeme & Konum Doğrulama</h2>
+        <p class="text-slate-500 text-sm">POS kurulum adresinizi haritada seçin ve kart bilgilerinizi girerek başvurunuzu tamamlayın.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- HARİTA BÖLÜMÜ -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 space-y-4">
+            <h3 class="font-bold text-sm text-[#0F172A]"><i class="fa-solid fa-map-pin text-[#FFC20E] mr-1"></i> Kurulum Adresi Seçimi</h3>
+            <div id="map"></div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+                <input type="text" id="lat" readonly class="bg-slate-100 p-2 rounded font-mono" placeholder="Enlem">
+                <input type="text" id="lng" readonly class="bg-slate-100 p-2 rounded font-mono" placeholder="Boylam">
+            </div>
+            <textarea id="address" class="w-full bg-slate-50 border rounded-lg text-xs p-2" rows="2" placeholder="Açık Adres Giriniz..."></textarea>
+        </div>
+
+        <!-- ÖDEME BÖLÜMÜ -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 space-y-4">
+            <h3 class="font-bold text-sm text-[#0F172A]"><i class="fa-solid fa-credit-card text-[#FFC20E] mr-1"></i> Sanal POS Ödeme</h3>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-400 font-bold mb-1">Kart Sahibi</label>
+                    <input type="text" id="pay-holder" class="w-full bg-slate-50 border p-2 rounded" placeholder="AHMET YILMAZ">
+                </div>
+                <div>
+                    <label class="block text-slate-400 font-bold mb-1">Kart Numarası</label>
+                    <input type="text" id="pay-number" maxlength="19" class="w-full bg-slate-50 border p-2 rounded font-mono" placeholder="5412 7500 0000 2026">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-slate-400 font-bold mb-1">SKT</label>
+                        <input type="text" id="pay-expiry" class="w-full bg-slate-50 border p-2 rounded font-mono" placeholder="09/28">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 font-bold mb-1">CVC</label>
+                        <input type="password" id="pay-cvv" maxlength="3" class="w-full bg-slate-50 border p-2 rounded font-mono" placeholder="312">
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="submitToPostgreSQL()" class="w-full bg-[#0F172A] hover:bg-slate-800 text-[#FFC20E] font-extrabold text-xs py-3.5 rounded-xl border border-[#FFC20E]/20 mt-4">
+                Ödemeyi Tamamla ve PostgreSQL'e Kaydet
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let map, marker;
+        document.addEventListener('DOMContentLoaded', () => {
+            map = L.map('map').setView([41.015, 28.979], 10);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            map.on('click', (e) => {
+                document.getElementById('lat').value = e.latlng.lat.toFixed(4);
+                document.getElementById('lng').value = e.latlng.lng.toFixed(4);
+                if (marker) marker.setLatLng(e.latlng);
+                else marker = L.marker(e.latlng).addTo(map);
+            });
+        });
+
+        async function submitToPostgreSQL() {
+            const customer = JSON.parse(sessionStorage.getItem('vakif_customer') || '{}');
+            const cart = JSON.parse(localStorage.getItem('vakif_cart') || '[]');
+
+            if (!customer.CompanyName || cart.length === 0) {
+                alert("Lütfen başvuru ve sepet adımlarını eksiksiz tamamlayın!");
+                return;
+            }
+
+            customer.City = "İstanbul";
+            customer.State = "Kadıköy";
+            customer.Address = document.getElementById('address').value || "Merkez Mah.";
+            customer.Latitude = parseFloat(document.getElementById('lat').value || "41.0150");
+            customer.Longitude = parseFloat(document.getElementById('lng').value || "28.9790");
+
+            const payload = {
+                Customer: customer,
+                CartItems: cart.map(x => ({ PosID: x.id, Quantity: x.quantity, Price: x.price, CommisionRate: x.rate })),
+                Payment: {
+                    CardHolderName: document.getElementById('pay-holder').value || "AHMET YILMAZ",
+                    CardNumber: document.getElementById('pay-number').value || "5412750000002026",
+                    CardExpirationDate: document.getElementById('pay-expiry').value || "09/28",
+                    CVC: document.getElementById('pay-cvv').value || "312",
+                    PaymentStatus: "Success"
+                },
+                TotalAmount: cart.reduce((a, b) => a + (b.price * b.quantity), 0)
+            };
+
+            const res = await fetch('/Home/CompleteApplication', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await res.json();
+            if (result.success) {
+                localStorage.removeItem('vakif_cart');
+                sessionStorage.removeItem('vakif_customer');
+                alert("Başvuru Başarılı! Sipariş Numaranız: " + result.orderId);
+                window.location.href = '/';
+            } else {
+                alert("Hata: " + result.message);
+            }
+        }
+    </script>
+}

@@ -13,5 +13,6 @@ public class CustomerDocument
     public DateTime createDate { get; set; } = DateTime.Now;
     public DateTime updateDate { get; set; } = DateTime.Now;
 
-    public Customer Customer { get; set; } = null!;
+    // Navigation Properties
+    public Customer Customer { get; set; }
 }

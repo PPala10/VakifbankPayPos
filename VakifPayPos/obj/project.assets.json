@@ -2181,11 +2181,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/poyrazpala/Desktop/workspace/C#/VakifbankPayPos/VakifPayPos/VakifPayPos.csproj",
+      "projectUniqueName": "/Users/poyrazpala/Desktop/workspace/C#/VakifbankPayPos-1/VakifPayPos/VakifPayPos.csproj",
       "projectName": "VakifPayPos",
-      "projectPath": "/Users/poyrazpala/Desktop/workspace/C#/VakifbankPayPos/VakifPayPos/VakifPayPos.csproj",
+      "projectPath": "/Users/poyrazpala/Desktop/workspace/C#/VakifbankPayPos-1/VakifPayPos/VakifPayPos.csproj",
       "packagesPath": "/Users/poyrazpala/.nuget/packages/",
-      "outputPath": "/Users/poyrazpala/Desktop/workspace/C#/VakifbankPayPos/VakifPayPos/obj/",
+      "outputPath": "/Users/poyrazpala/Desktop/workspace/C#/VakifbankPayPos-1/VakifPayPos/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/poyrazpala/.nuget/NuGet/NuGet.Config"

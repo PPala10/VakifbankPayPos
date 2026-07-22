@@ -1,8 +1,52 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<VakifPayPos.Models.Pos>
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "POS Cihaz Kataloğu";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="space-y-8">
+    <div class="text-center max-w-2xl mx-auto space-y-3">
+        <span class="bg-[#FFC20E]/15 text-[#0F172A] text-xs font-extrabold px-3 py-1 rounded-full border border-[#FFC20E]/30 uppercase">VakıfPayPos Ürün Portföyü</span>
+        <h1 class="text-3xl font-extrabold tracking-tight text-[#0F172A] sm:text-4xl">Yeni Nesil Fiziki POS Modelleri</h1>
+        <p class="text-slate-500 text-sm">VakıfBank güvencesiyle işletmenize en uygun POS cihazını sepetinize ekleyin ve hemen başvurun.</p>
+    </div>
+
+    <!-- Ürün Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var pos in Model)
+        {
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                <div class="p-6">
+                    <div class="h-32 w-full bg-slate-50 rounded-xl flex items-center justify-center mb-4 border border-slate-100 p-4">
+                        <i class="fa-solid fa-credit-card text-4xl text-[#0F172A]"></i>
+                    </div>
+                    <span class="text-[10px] font-extrabold text-[#0F172A] bg-amber-100 px-2 py-0.5 rounded-full border border-[#FFC20E]/50">@pos.posType.ToUpper()</span>
+                    <h3 class="text-base font-bold text-slate-900 mt-2">@pos.posName</h3>
+                    <p class="text-slate-500 text-xs line-clamp-2 mt-1">@pos.description</p>
+                    <div class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 gap-2 text-[11px]">
+                        <div class="text-slate-500">Komisyon: <span class="text-slate-800 font-bold">%@pos.commisionRate</span></div>
+                        <div class="text-slate-500">Valör: <span class="text-slate-800 font-bold">@pos.valorType</span></div>
+                    </div>
+                </div>
+                <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] text-slate-400 block font-semibold">@pos.priceType</span>
+                        <span class="text-base font-bold text-[#0F172A]">@pos.price.ToString("N0") TL</span>
+                    </div>
+                    <button onclick="addToCart(@pos.posID, '@pos.posName', @pos.price, @pos.commisionRate)" class="bg-[#0F172A] hover:bg-slate-800 text-[#FFC20E] text-[11px] font-extrabold px-3.5 py-2.5 rounded-xl transition-all shadow-sm">
+                        Sepete Ekle
+                    </button>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-span-4 text-center py-12 bg-white rounded-2xl border">
+            <p class="text-slate-500 font-bold">Henüz veritabanında tanımlı POS cihazı bulunamadı.</p>
+        </div>
+    }   
 </div>

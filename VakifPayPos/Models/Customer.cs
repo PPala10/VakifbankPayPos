@@ -13,8 +13,8 @@ public class Customer
     public string managerName { get; set; } 
     public long managerTCKN { get; set; }
     public string phone { get; set; } 
-    public string email { get; set; } = string.Empty;
-    public string webURL { get; set; } = string.Empty;
+    public string email { get; set; } 
+    public string webURL { get; set; }
     public string city { get; set; }
     public string state { get; set; } 
     public string IBAN { get; set; } 

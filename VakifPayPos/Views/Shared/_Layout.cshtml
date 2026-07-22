@@ -1,50 +1,154 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - VakifPayPos</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/VakifPayPos.styles.css" asp-append-version="true" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - VakıfPayPos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        #map { height: 320px; border-radius: 0.75rem; }
+    </style>
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">VakifPayPos</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <div id="toast-container" class="fixed top-5 right-5 z-[9999] pointer-events-none flex flex-col gap-3"></div>
+
+    <!-- NAVBAR -->
+    <header class="bg-white border-b-4 border-[#FFC20E] sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <a href="/" class="flex items-center space-x-3">
+                <div class="bg-[#0F172A] text-[#FFC20E] p-2.5 rounded-xl flex items-center justify-center shadow-md border border-[#FFC20E]/20">
+                    <i class="fa-solid fa-credit-card text-2xl"></i>
                 </div>
+                <div>
+                    <span class="font-extrabold text-2xl tracking-tight text-[#0F172A]">Vakıf<span class="text-[#FFC20E] bg-[#0F172A] px-2 py-0.5 rounded ml-1">PayPos</span></span>
+                    <span class="block text-[10px] text-slate-500 font-extrabold uppercase tracking-widest mt-0.5">Kurumsal Ödeme Çözümleri</span>
+                </div>
+            </a>
+
+            <!-- SAĞ SEPET BUTONU -->
+            <div class="flex items-center space-x-4">
+                <button onclick="toggleCartModal()" class="relative p-2.5 text-[#0F172A] hover:text-[#FFC20E] hover:bg-[#0F172A] transition-all focus:outline-none bg-slate-100 rounded-xl">
+                    <i class="fa-solid fa-basket-shopping text-xl"></i>
+                    <span id="cart-badge" class="absolute -top-1 -right-1 bg-[#FFC20E] text-[#0F172A] text-[11px] font-extrabold rounded-full w-5 h-5 flex items-center justify-center shadow border-2 border-white hidden">0</span>
+                </button>
             </div>
-        </nav>
+        </div>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+        @RenderBody()
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400">
+        <p>&copy; 2026 VakıfPayPos - Türkiye Vakıflar Bankası T.A.O.</p>
+    </footer>
+
+    <!-- SEPET MODALI -->
+    <div id="cart-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full border border-slate-200 shadow-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h3 class="text-base font-bold text-[#0F172A]">Alışveriş Sepeti</h3>
+                <button onclick="toggleCartModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-6 space-y-4 max-h-96 overflow-y-auto" id="cart-items-wrapper"></div>
+            <div id="cart-footer" class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between hidden">
+                <div>
+                    <span class="text-[10px] text-slate-400 block font-bold">Toplam Tutar</span>
+                    <span id="cart-total-price" class="text-base font-extrabold text-[#0F172A]">0 TL</span>
+                </div>
+                <a href="/Home/Onboarding" class="bg-[#0F172A] hover:bg-slate-800 text-[#FFC20E] text-xs font-extrabold px-4 py-2.5 rounded-lg flex items-center space-x-1.5 border border-[#FFC20E]/20">
+                    <span>Başvuruya Geç</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - VakifPayPos - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    <!-- YARDIMCI SEPET SCRIPT'İ -->
+    <script>
+        function getCart() { return JSON.parse(localStorage.getItem('vakif_cart') || '[]'); }
+        function saveCart(cart) { localStorage.setItem('vakif_cart', JSON.stringify(cart)); updateCartUI(); }
+
+        function addToCart(id, name, price, rate) {
+            let cart = getCart();
+            let item = cart.find(x => x.id === id);
+            if (item) { item.quantity++; } 
+            else { cart.push({ id, name, price, rate, quantity: 1 }); }
+            saveCart(cart);
+            showToast(`${name} sepetinize eklendi!`, "success");
+        }
+
+        function removeOneFromCart(id) {
+            let cart = getCart();
+            let item = cart.find(x => x.id === id);
+            if (item) {
+                item.quantity--;
+                if (item.quantity <= 0) cart = cart.filter(x => x.id !== id);
+            }
+            saveCart(cart);
+        }
+
+        function toggleCartModal() { document.getElementById('cart-modal').classList.toggle('hidden'); }
+
+        function updateCartUI() {
+            const cart = getCart();
+            const wrapper = document.getElementById('cart-items-wrapper');
+            const badge = document.getElementById('cart-badge');
+            const footer = document.getElementById('cart-footer');
+            const totalPriceEl = document.getElementById('cart-total-price');
+
+            const totalQty = cart.reduce((a, b) => a + b.quantity, 0);
+            if (totalQty > 0) {
+                badge.innerText = totalQty;
+                badge.classList.remove('hidden');
+                footer.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+                footer.classList.add('hidden');
+                wrapper.innerHTML = `<p class="text-center text-slate-400 text-sm py-4">Sepetiniz boş.</p>`;
+                return;
+            }
+
+            let html = '';
+            let grandTotal = 0;
+            cart.forEach(item => {
+                const subtotal = item.price * item.quantity;
+                grandTotal += subtotal;
+                html += `
+                    <div class="flex items-center justify-between bg-slate-50 p-3 rounded-lg border text-xs">
+                        <div>
+                            <h4 class="font-extrabold text-[#0F172A]">${item.name}</h4>
+                            <p class="text-slate-400 text-[10px]">Komisyon: %${item.rate}</p>
+                            <div class="flex items-center space-x-2 pt-1">
+                                <button onclick="removeOneFromCart(${item.id})" class="bg-white border px-1.5 rounded"><i class="fa-solid fa-minus"></i></button>
+                                <span class="font-bold">${item.quantity}</span>
+                                <button onclick="addToCart(${item.id}, '${item.name}', ${item.price}, ${item.rate})" class="bg-white border px-1.5 rounded"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <span class="font-bold text-[#0F172A]">${subtotal.toLocaleString('tr-TR')} TL</span>
+                    </div>`;
+            });
+            wrapper.innerHTML = html;
+            totalPriceEl.innerText = grandTotal.toLocaleString('tr-TR') + " TL";
+        }
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `p-3 rounded-xl shadow-lg border text-xs font-bold bg-amber-50 text-amber-900 border-[#FFC20E]/40 pointer-events-auto`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-info mr-1 text-[#FFC20E]"></i> ${msg}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', updateCartUI);
+    </script>
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

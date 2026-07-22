@@ -18,5 +18,6 @@ public class Pos
     public DateTime createDate { get; set; } = DateTime.Now;
     public DateTime updateDate { get; set; } = DateTime.Now;
 
+    // Navigation Properties
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 }

@@ -14,5 +14,6 @@ public class Payment
     public string PaymentStatus { get; set; } = "Success";
     public DateTime PaidDate { get; set; } = DateTime.Now;
 
+    // Navigation Properties
     public Order Order { get; set; } = null!;
 }

@@ -14,6 +14,7 @@ public class OrderItem
     public DateTime createDate { get; set; } = DateTime.Now;
     public DateTime updateDate { get; set; } = DateTime.Now;
 
+    // Navigation Properties
     public Order Order { get; set; } = null!;
     public Pos Pos { get; set; } = null!;
 }

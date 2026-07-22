@@ -12,7 +12,8 @@ public class Order
     public DateTime createDate { get; set; } = DateTime.Now;
     public DateTime updateDate { get; set; } = DateTime.Now;
     
-    public Customer Customer { get; set; } = null!;
+    // Navigation Properties
+    public Customer Customer { get; set; }
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     public ICollection<Payment> Payments { get; set; } = new List<Payment>();
 }

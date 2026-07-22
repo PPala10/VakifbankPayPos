@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "GIIIQI04Z14=",
+  "dgSpecHash": "eiVf1MFCMOw=",
   "success": true,
-  "projectFilePath": "/Users/poyrazpala/Desktop/workspace/C#/VakifbankPayPos/VakifPayPos/VakifPayPos.csproj",
+  "projectFilePath": "/Users/poyrazpala/Desktop/workspace/C#/VakifbankPayPos-1/VakifPayPos/VakifPayPos.csproj",
   "expectedPackageFiles": [
     "/Users/poyrazpala/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
     "/Users/poyrazpala/.nuget/packages/microsoft.build.framework/18.0.2/microsoft.build.framework.18.0.2.nupkg.sha512",
