@@ -1,0 +1,69 @@
+<svg width="280" height="340" viewBox="0 0 280 340" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 1. Taban Gölgesi -->
+  <ellipse cx="140" cy="330" rx="75" ry="8" fill="#000000" fill-opacity="0.12"/>
+
+  <!-- 2. Akıllı POS Ana Gövdesi (Sleek Modern Kasa) -->
+  <rect x="70" y="20" width="140" height="290" rx="26" fill="#0F172A"/>
+  <!-- İç Derinlik Çerçevesi -->
+  <rect x="74" y="24" width="132" height="282" rx="22" stroke="#1E293B" stroke-width="2" fill="none"/>
+
+  <!-- Üst Yazıcı / Kamera & QR Sensör Bandı -->
+  <rect x="84" y="28" width="112" height="12" rx="4" fill="#1E293B"/>
+  <circle cx="140" cy="34" r="2.5" fill="#38BDF8"/> <!-- Kamera Merceği -->
+  <circle cx="122" cy="34" r="1.5" fill="#EF4444"/> <!-- Lazer Flaş / Sensör -->
+
+  <!-- 3. Dev Dokunmatik Cam Ekran (Full Screen OLED) -->
+  <rect x="78" y="46" width="124" height="230" rx="14" fill="#020617"/>
+  <rect x="78" y="46" width="124" height="230" rx="14" stroke="#334155" stroke-width="1.5" fill="none"/>
+
+  <!-- EKRAN İÇİ ARAYÜZ ELEMANLARI -->
+  <!-- Header / Sarı Üst Band -->
+  <rect x="78" y="46" width="124" height="22" rx="14" fill="#FFC20E"/>
+  <rect x="78" y="58" width="124" height="10" fill="#FFC20E"/> <!-- Köşe Düzeltme -->
+  <text x="140" y="61" fill="#0F172A" font-family="'Segoe UI', Roboto, sans-serif" font-size="8" font-weight="900" text-anchor="middle" letter-spacing="0.5">VUK 507 ENTEGRE POS</text>
+
+  <!-- Bulut & e-Arşiv Rozeti (& işareti &amp; olarak düzeltildi) -->
+  <rect x="85" y="74" width="110" height="18" rx="4" fill="#10B981" fill-opacity="0.18"/>
+  <text x="140" y="86.5" fill="#10B981" font-family="'Segoe UI', Roboto, sans-serif" font-size="6.5" font-weight="800" text-anchor="middle">☁️ e-ARŞİV &amp; BULUT ENTEGRE</text>
+
+  <!-- Tutar Display -->
+  <text x="140" y="110" fill="#FFFFFF" font-family="'Segoe UI', Roboto, sans-serif" font-size="13.5" font-weight="900" text-anchor="middle">₺4.190,00</text>
+  <text x="140" y="122" fill="#94A3B8" font-family="'Segoe UI', Roboto, sans-serif" font-size="6.5" font-weight="600" text-anchor="middle">Dokunmatik Ekran Onayı</text>
+
+  <!-- Sanal Dokunmatik Keypad (3x3 Tuş Dizilimi) -->
+  <!-- Satır 1 -->
+  <rect x="85" y="132" width="32" height="19" rx="5" fill="#1E293B"/><text x="101" y="145" fill="#F8FAFC" font-family="'Segoe UI', Roboto, sans-serif" font-size="8.5" font-weight="800" text-anchor="middle">1</text>
+  <rect x="124" y="132" width="32" height="19" rx="5" fill="#1E293B"/><text x="140" y="145" fill="#F8FAFC" font-family="'Segoe UI', Roboto, sans-serif" font-size="8.5" font-weight="800" text-anchor="middle">2</text>
+  <rect x="163" y="132" width="32" height="19" rx="5" fill="#1E293B"/><text x="179" y="145" fill="#F8FAFC" font-family="'Segoe UI', Roboto, sans-serif" font-size="8.5" font-weight="800" text-anchor="middle">3</text>
+
+  <!-- Satır 2 -->
+  <rect x="85" y="155" width="32" height="19" rx="5" fill="#1E293B"/><text x="101" y="168" fill="#F8FAFC" font-family="'Segoe UI', Roboto, sans-serif" font-size="8.5" font-weight="800" text-anchor="middle">4</text>
+  <rect x="124" y="155" width="32" height="19" rx="5" fill="#1E293B"/><text x="140" y="168" fill="#F8FAFC" font-family="'Segoe UI', Roboto, sans-serif" font-size="8.5" font-weight="800" text-anchor="middle">5</text>
+  <rect x="163" y="155" width="32" height="19" rx="5" fill="#1E293B"/><text x="179" y="168" fill="#F8FAFC" font-family="'Segoe UI', Roboto, sans-serif" font-size="8.5" font-weight="800" text-anchor="middle">6</text>
+
+  <!-- Satır 3 -->
+  <rect x="85" y="178" width="32" height="19" rx="5" fill="#1E293B"/><text x="101" y="191" fill="#F8FAFC" font-family="'Segoe UI', Roboto, sans-serif" font-size="8.5" font-weight="800" text-anchor="middle">7</text>
+  <rect x="124" y="178" width="32" height="19" rx="5" fill="#1E293B"/><text x="140" y="191" fill="#F8FAFC" font-family="'Segoe UI', Roboto, sans-serif" font-size="8.5" font-weight="800" text-anchor="middle">8</text>
+  <rect x="163" y="178" width="32" height="19" rx="5" fill="#1E293B"/><text x="179" y="191" fill="#F8FAFC" font-family="'Segoe UI', Roboto, sans-serif" font-size="8.5" font-weight="800" text-anchor="middle">9</text>
+
+  <!-- Ana Ödeme Butonu -->
+  <rect x="85" y="202" width="110" height="24" rx="7" fill="#10B981"/>
+  <text x="140" y="217.5" fill="#FFFFFF" font-family="'Segoe UI', Roboto, sans-serif" font-size="9.5" font-weight="900" text-anchor="middle" letter-spacing="0.3">DOKUNMATİK ÖDE</text>
+
+  <!-- Temassız Ödeme İkonu (Ekran Altı) -->
+  <path d="M134 238 A 4 4 0 0 1 134 244" stroke="#FFC20E" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+  <path d="M137 236 A 7 7 0 0 1 137 246" stroke="#FFC20E" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+
+  <!-- Android Navigation Bar -->
+  <rect x="125" y="265" width="30" height="3" rx="1.5" fill="#475569"/>
+
+  <!-- 4. Alt Çipli Kart Okuyucu Yuvası -->
+  <rect x="90" y="286" width="100" height="4" rx="2" fill="#020617"/>
+
+  <!-- Yuvaya Takılı Banka Kartı -->
+  <g transform="translate(0, 10)">
+    <rect x="105" y="280" width="70" height="34" rx="5" fill="#1E293B" stroke="#FFC20E" stroke-width="1.2"/>
+    <rect x="105" y="287" width="70" height="6" fill="#020617"/>
+    <rect x="113" y="297" width="10" height="8" rx="2" fill="#FFC20E"/>
+  </g>
+</svg>

@@ -1,0 +1,60 @@
+<svg width="280" height="340" viewBox="0 0 280 340" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 1. Taban Gölgesi -->
+  <ellipse cx="140" cy="325" rx="80" ry="9" fill="#000000" fill-opacity="0.12"/>
+
+  <!-- 2. Arkadan Çıkan Spiral Ethernet / Güç Kablosu -->
+  <path d="M 195 240 Q 225 245 220 265 T 200 285 T 225 305 L 245 315" stroke="#334155" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M 195 240 Q 225 245 220 265 T 200 285 T 225 305 L 245 315" stroke="#475569" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+  <!-- 3. Tezgah Üstü Ağır Masa Standı (Dock / Foot) -->
+  <rect x="75" y="270" width="130" height="42" rx="14" fill="#1E293B"/>
+  <rect x="85" y="278" width="110" height="12" rx="6" fill="#020617"/>
+  <circle cx="140" cy="284" r="3" fill="#10B981"/> <!-- Stant Bağlantı LED'i -->
+
+  <!-- 4. POS Cihazı Gövdesi (Eğimli Kasa) -->
+  <rect x="70" y="38" width="140" height="240" rx="26" fill="#0F172A"/>
+  <rect x="74" y="42" width="132" height="232" rx="22" stroke="#1E293B" stroke-width="2" fill="none"/>
+
+  <!-- Üst Kağıt Haznesi -->
+  <rect x="85" y="46" width="110" height="8" rx="4" fill="#1E293B"/>
+
+  <!-- 5. Dijital Ekran -->
+  <rect x="84" y="62" width="112" height="98" rx="12" fill="#1E293B"/>
+  <rect x="88" y="66" width="104" height="90" rx="9" fill="#020617"/>
+
+  <!-- Ekran Header -->
+  <rect x="88" y="66" width="104" height="20" fill="#FFC20E"/>
+  <text x="140" y="80" fill="#0F172A" font-family="'Segoe UI', Roboto, sans-serif" font-size="8.5" font-weight="900" text-anchor="middle" letter-spacing="0.8">SABİT ETHERNET POS</text>
+
+  <!-- Ekran İçi Bilgi -->
+  <rect x="100" y="96" width="80" height="14" rx="4" fill="#334155" fill-opacity="0.4"/>
+  <text x="140" y="106" fill="#38BDF8" font-family="'Segoe UI', Roboto, sans-serif" font-size="7" font-weight="800" text-anchor="middle">HAT: ONLINE (LAN)</text>
+  
+  <text x="140" y="132" fill="#FFFFFF" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="900" text-anchor="middle">₺149,00/ay</text>
+  <text x="140" y="145" fill="#94A3B8" font-family="'Segoe UI', Roboto, sans-serif" font-size="7" font-weight="600" text-anchor="middle">Kesintisiz Tezgah Bağlantısı</text>
+
+  <!-- 6. Temassız İkonu -->
+  <path d="M133 168 A 4 4 0 0 1 133 174" stroke="#FFC20E" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+  <path d="M136 166 A 7 7 0 0 1 136 176" stroke="#FFC20E" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+
+  <!-- 7. Tuş Takımı (3x4 Grid) -->
+  <!-- Satır 1 -->
+  <rect x="88" y="184" width="28" height="15" rx="4" fill="#334155"/><circle cx="102" cy="191.5" r="2" fill="#F8FAFC"/>
+  <rect x="126" y="184" width="28" height="15" rx="4" fill="#334155"/><circle cx="140" cy="191.5" r="2" fill="#F8FAFC"/>
+  <rect x="164" y="184" width="28" height="15" rx="4" fill="#EF4444"/> <!-- İptal -->
+
+  <!-- Satır 2 -->
+  <rect x="88" y="204" width="28" height="15" rx="4" fill="#334155"/><circle cx="102" cy="211.5" r="2" fill="#F8FAFC"/>
+  <rect x="126" y="204" width="28" height="15" rx="4" fill="#334155"/><circle cx="140" cy="211.5" r="2" fill="#F8FAFC"/>
+  <rect x="164" y="204" width="28" height="15" rx="4" fill="#F59E0B"/> <!-- Silme -->
+
+  <!-- Satır 3 -->
+  <rect x="88" y="224" width="28" height="15" rx="4" fill="#334155"/><circle cx="102" cy="231.5" r="2" fill="#F8FAFC"/>
+  <rect x="126" y="224" width="28" height="15" rx="4" fill="#334155"/><circle cx="140" cy="231.5" r="2" fill="#F8FAFC"/>
+  <rect x="164" y="224" width="28" height="15" rx="4" fill="#10B981"/> <!-- Onay -->
+
+  <!-- Satır 4 -->
+  <rect x="88" y="244" width="28" height="15" rx="4" fill="#1E293B"/>
+  <rect x="126" y="244" width="28" height="15" rx="4" fill="#334155"/><circle cx="140" cy="251.5" r="2" fill="#F8FAFC"/>
+  <rect x="164" y="244" width="28" height="15" rx="4" fill="#FFC20E"/>
+</svg>

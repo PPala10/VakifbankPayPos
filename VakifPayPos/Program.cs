@@ -3,6 +3,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL;
 using VakifPayPos.Data;     
 using VakifPayPos.Models;
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

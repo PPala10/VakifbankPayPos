@@ -1,0 +1,121 @@
+<svg width="280" height="350" viewBox="0 0 280 350" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 1. Taban Gölgesi -->
+  <ellipse cx="140" cy="335" rx="85" ry="9" fill="#000000" fill-opacity="0.12"/>
+
+  <!-- 2. Üstten Çıkan Mali Fiş (GİB Fişi) -->
+  <g transform="translate(0, -2)">
+    <!-- Fiş Gövdesi -->
+    <path d="M 95 55 L 95 12 L 98 8 L 102 12 L 106 8 L 110 12 L 114 8 L 118 12 L 122 8 L 126 12 L 130 8 L 134 12 L 138 8 L 142 12 L 146 8 L 150 12 L 154 8 L 158 12 L 162 8 L 166 12 L 170 8 L 174 12 L 178 8 L 182 12 L 185 8 L 185 55 Z" fill="#FFFFFF"/>
+    
+    <!-- Fiş Başlığı & Çizgiler -->
+    <rect x="110" y="15" width="60" height="3" rx="1.5" fill="#0F172A"/>
+    <text x="140" y="24" fill="#64748B" font-family="'Segoe UI', Roboto, sans-serif" font-size="5.5" font-weight="800" text-anchor="middle">MALİ FİŞ / GİB ONAYLI</text>
+    <rect x="103" y="28" width="50" height="2" rx="1" fill="#CBD5E1"/>
+    <rect x="103" y="32" width="40" height="2" rx="1" fill="#CBD5E1"/>
+    <rect x="103" y="37" width="46" height="2.5" rx="1" fill="#FFC20E"/>
+
+    <!-- Fiş Üzerindeki QR Kod İllüstrasyonu -->
+    <rect x="158" y="27" width="18" height="18" rx="2" fill="#0F172A"/>
+    <rect x="161" y="30" width="5" height="5" fill="#FFFFFF"/>
+    <rect x="168" y="30" width="5" height="5" fill="#FFFFFF"/>
+    <rect x="161" y="37" width="5" height="5" fill="#FFFFFF"/>
+    <rect x="168" y="37" width="3" height="3" fill="#FFC20E"/>
+  </g>
+
+  <!-- 3. ÖKC Cihazı Ana Gövdesi (Geniş Kasa) -->
+  <rect x="65" y="48" width="150" height="252" rx="26" fill="#0F172A"/>
+  <!-- İç Çerçeve / Bevel Line -->
+  <rect x="69" y="52" width="142" height="244" rx="22" stroke="#1E293B" stroke-width="2" fill="none"/>
+
+  <!-- Termal Yazıcı Kapağı ve Şerit -->
+  <rect x="80" y="56" width="120" height="10" rx="5" fill="#1E293B"/>
+  <rect x="88" y="60" width="104" height="2" fill="#020617"/>
+  <circle cx="192" cy="61" r="2.5" fill="#10B981"/> <!-- Çalışıyor LED'i -->
+
+  <!-- 4. Dijital ÖKC Ekranı -->
+  <rect x="78" y="72" width="124" height="108" rx="12" fill="#1E293B"/>
+  <rect x="82" y="76" width="116" height="100" rx="8" fill="#020617"/>
+
+  <!-- Ekran Header (Sarı Şerit) -->
+  <rect x="82" y="76" width="116" height="20" fill="#FFC20E"/>
+  <text x="140" y="90" fill="#0F172A" font-family="'Segoe UI', Roboto, sans-serif" font-size="8.5" font-weight="900" text-anchor="middle" letter-spacing="0.8">VAKIFÖKC PRO-300</text>
+
+  <!-- Mali Mod ve Durum Göstergesi -->
+  <rect x="88" y="101" width="46" height="12" rx="3" fill="#10B981" fill-opacity="0.2"/>
+  <circle cx="94" cy="107" r="2.5" fill="#10B981"/>
+  <text x="114" y="109.5" fill="#10B981" font-family="'Segoe UI', Roboto, sans-serif" font-size="6.5" font-weight="800" text-anchor="middle">MALİ MOD</text>
+
+  <rect x="156" y="101" width="36" height="12" rx="3" fill="#334155"/>
+  <text x="174" y="109.5" fill="#F8FAFC" font-family="'Segoe UI', Roboto, sans-serif" font-size="6" font-weight="700" text-anchor="middle">GİB V.4</text>
+
+  <!-- Ekran Tutar Bilgileri -->
+  <text x="140" y="134" fill="#FFFFFF" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="900" text-anchor="middle">₺3.490,00</text>
+  <text x="140" y="147" fill="#94A3B8" font-family="'Segoe UI', Roboto, sans-serif" font-size="7" font-weight="600" text-anchor="middle">KDV (%20): ₺581,66</text>
+  <text x="140" y="160" fill="#FFC20E" font-family="'Segoe UI', Roboto, sans-serif" font-size="6.5" font-weight="800" text-anchor="middle">KISIM 1 - GENEL SATIŞ</text>
+
+  <!-- 5. Dahili Barkod / Lazer Okuyucu Bandı -->
+  <rect x="82" y="188" width="116" height="10" rx="3" fill="#1E293B"/>
+  <rect x="115" y="191" width="50" height="4" rx="2" fill="#020617"/>
+  <circle cx="140" cy="193" r="1.8" fill="#EF4444"/> <!-- Lazer Merceği -->
+
+  <!-- 6. Yazarkasa Tuş Takımı (4x4 Grid) -->
+  <!-- Satır 1: Departman ve KDV Tuşları -->
+  <rect x="82" y="204" width="25" height="15" rx="3.5" fill="#334155"/>
+  <text x="94.5" y="214" fill="#FFC20E" font-family="'Segoe UI', Roboto, sans-serif" font-size="6" font-weight="900" text-anchor="middle">KS1</text>
+
+  <rect x="112" y="204" width="25" height="15" rx="3.5" fill="#334155"/>
+  <text x="124.5" y="214" fill="#FFC20E" font-family="'Segoe UI', Roboto, sans-serif" font-size="6" font-weight="900" text-anchor="middle">KS2</text>
+
+  <rect x="142" y="204" width="25" height="15" rx="3.5" fill="#334155"/>
+  <text x="154.5" y="214" fill="#38BDF8" font-family="'Segoe UI', Roboto, sans-serif" font-size="6" font-weight="900" text-anchor="middle">KDV</text>
+
+  <rect x="172" y="204" width="26" height="15" rx="3.5" fill="#EF4444"/> <!-- İptal -->
+  <text x="185" y="214" fill="#FFFFFF" font-family="'Segoe UI', Roboto, sans-serif" font-size="5.5" font-weight="900" text-anchor="middle">İPTAL</text>
+
+  <!-- Satır 2 -->
+  <rect x="82" y="223" width="25" height="15" rx="3.5" fill="#1E293B"/>
+  <circle cx="94.5" cy="230.5" r="1.8" fill="#F8FAFC"/>
+
+  <rect x="112" y="223" width="25" height="15" rx="3.5" fill="#1E293B"/>
+  <circle cx="124.5" cy="230.5" r="1.8" fill="#F8FAFC"/>
+
+  <rect x="142" y="223" width="25" height="15" rx="3.5" fill="#1E293B"/>
+  <circle cx="154.5" cy="230.5" r="1.8" fill="#F8FAFC"/>
+
+  <rect x="172" y="223" width="26" height="15" rx="3.5" fill="#F59E0B"/> <!-- Silme -->
+  <text x="185" y="233" fill="#FFFFFF" font-family="'Segoe UI', Roboto, sans-serif" font-size="5.5" font-weight="900" text-anchor="middle">C/CE</text>
+
+  <!-- Satır 3 -->
+  <rect x="82" y="242" width="25" height="15" rx="3.5" fill="#1E293B"/>
+  <circle cx="94.5" cy="249.5" r="1.8" fill="#F8FAFC"/>
+
+  <rect x="112" y="242" width="25" height="15" rx="3.5" fill="#1E293B"/>
+  <circle cx="124.5" cy="249.5" r="1.8" fill="#F8FAFC"/>
+
+  <rect x="142" y="242" width="25" height="15" rx="3.5" fill="#1E293B"/>
+  <circle cx="154.5" cy="249.5" r="1.8" fill="#F8FAFC"/>
+
+  <rect x="172" y="242" width="26" height="15" rx="3.5" fill="#FFC20E"/> <!-- Kart ile Ödeme -->
+  <text x="185" y="252" fill="#0F172A" font-family="'Segoe UI', Roboto, sans-serif" font-size="5.5" font-weight="900" text-anchor="middle">KART</text>
+
+  <!-- Satır 4 -->
+  <rect x="82" y="261" width="25" height="15" rx="3.5" fill="#020617"/>
+  <rect x="112" y="261" width="25" height="15" rx="3.5" fill="#1E293B"/>
+  <circle cx="124.5" cy="268.5" r="1.8" fill="#F8FAFC"/>
+
+  <rect x="142" y="261" width="25" height="15" rx="3.5" fill="#1E293B"/>
+  <circle cx="154.5" cy="268.5" r="1.8" fill="#F8FAFC"/>
+
+  <rect x="172" y="261" width="26" height="15" rx="3.5" fill="#10B981"/> <!-- Nakit / Onay -->
+  <text x="185" y="271" fill="#FFFFFF" font-family="'Segoe UI', Roboto, sans-serif" font-size="5.5" font-weight="900" text-anchor="middle">NAKİT</text>
+
+  <!-- 7. Alt Çipli Kart Yuvası -->
+  <rect x="88" y="285" width="104" height="4" rx="2" fill="#020617"/>
+
+  <!-- Yuvadaki Kart -->
+  <g transform="translate(0, 10)">
+    <rect x="105" y="280" width="70" height="34" rx="5" fill="#1E293B" stroke="#FFC20E" stroke-width="1.2"/>
+    <rect x="105" y="287" width="70" height="6" fill="#020617"/>
+    <rect x="113" y="297" width="10" height="8" rx="2" fill="#FFC20E"/>
+  </g>
+</svg>

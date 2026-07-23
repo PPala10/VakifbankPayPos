@@ -1,0 +1,93 @@
+<svg width="280" height="330" viewBox="0 0 280 330" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 1. Taban Gölgesi -->
+  <ellipse cx="140" cy="315" rx="75" ry="8" fill="#000000" fill-opacity="0.12"/>
+
+  <!-- 2. Üst Kağıt Haznesi & Fiş (Kağıt Çıkışı) -->
+  <path d="M 100 45 L 100 14 C 100 11, 103 9, 106 9 L 174 9 C 177 9, 180 11, 180 14 L 180 45 Z" fill="#F8FAFC"/>
+  <!-- Tırtıklı Fiş Kesim Çizgisi -->
+  <path d="M 100 9 L 105 12 L 110 9 L 115 12 L 120 9 L 125 12 L 130 9 L 135 12 L 140 9 L 145 12 L 150 9 L 155 12 L 160 9 L 165 12 L 170 9 L 175 12 L 180 9" stroke="#CBD5E1" stroke-width="1.5" fill="none"/>
+  <!-- Fiş Üzerindeki Temsili Yazı Çizgileri -->
+  <rect x="112" y="16" width="56" height="3" rx="1.5" fill="#FFC20E"/>
+  <rect x="108" y="23" width="64" height="2" rx="1" fill="#94A3B8"/>
+  <rect x="114" y="28" width="52" height="2" rx="1" fill="#CBD5E1"/>
+  <rect x="108" y="33" width="40" height="2" rx="1" fill="#CBD5E1"/>
+
+  <!-- 3. POS Cihazı Ana Gövdesi (Kasa) -->
+  <rect x="70" y="38" width="140" height="250" rx="28" fill="#0F172A"/>
+  <!-- Gövde İçi Derinlik / Çerçeve Çizgisi -->
+  <rect x="74" y="42" width="132" height="242" rx="24" stroke="#1E293B" stroke-width="2" fill="none"/>
+
+  <!-- Yazıcı Haznesi Üst Kapağı -->
+  <rect x="85" y="46" width="110" height="8" rx="4" fill="#1E293B"/>
+
+  <!-- 4. Dijital Ekran Çerçevesi -->
+  <rect x="84" y="62" width="112" height="98" rx="12" fill="#1E293B"/>
+  <!-- Ekran İçi (OLED Display) -->
+  <rect x="88" y="66" width="104" height="90" rx="9" fill="#020617"/>
+
+  <!-- EKRAN İÇİ ARAYÜZ ELEMANLARI -->
+  <!-- Header / Marka Bandı -->
+  <rect x="88" y="66" width="104" height="20" fill="#FFC20E"/>
+  <text x="140" y="80" fill="#0F172A" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="900" text-anchor="middle" letter-spacing="1">VAKIFPAYPOS</text>
+  
+  <!-- Onay İkonu (Yeşil Daire + Tik) -->
+  <circle cx="140" cy="106" r="11" fill="#10B981" fill-opacity="0.2"/>
+  <circle cx="140" cy="106" r="8" fill="#10B981"/>
+  <path d="M136.5 106L139 108.5L143.5 103.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Tutar ve Durum -->
+  <text x="140" y="128" fill="#FFFFFF" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" text-anchor="middle">₺149,00</text>
+  <text x="140" y="140" fill="#94A3B8" font-family="'Segoe UI', Roboto, sans-serif" font-size="7.5" font-weight="600" text-anchor="middle">İşlem Onaylandı</text>
+
+  <!-- 5. Temassız Ödeme Simgesi (Ekran Altı) -->
+  <path d="M133 169 A 4 4 0 0 1 133 175" stroke="#FFC20E" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+  <path d="M136 167 A 7 7 0 0 1 136 177" stroke="#FFC20E" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+  <path d="M139 165 A 10 10 0 0 1 139 179" stroke="#FFC20E" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+
+  <!-- 6. Tuş Takımı (Geometrik Grid) -->
+  <!-- Satır 1 -->
+  <rect x="88" y="186" width="28" height="16" rx="4" fill="#334155"/>
+  <circle cx="102" cy="194" r="2" fill="#F8FAFC"/>
+  
+  <rect x="126" y="186" width="28" height="16" rx="4" fill="#334155"/>
+  <circle cx="140" cy="194" r="2" fill="#F8FAFC"/>
+  
+  <rect x="164" y="186" width="28" height="16" rx="4" fill="#EF4444"/> <!-- İptal / Kırmızı -->
+
+  <!-- Satır 2 -->
+  <rect x="88" y="207" width="28" height="16" rx="4" fill="#334155"/>
+  <circle cx="102" cy="215" r="2" fill="#F8FAFC"/>
+
+  <rect x="126" y="207" width="28" height="16" rx="4" fill="#334155"/>
+  <circle cx="140" cy="215" r="2" fill="#F8FAFC"/>
+
+  <rect x="164" y="207" width="28" height="16" rx="4" fill="#F59E0B"/> <!-- Silme / Sarı -->
+
+  <!-- Satır 3 -->
+  <rect x="88" y="228" width="28" height="16" rx="4" fill="#334155"/>
+  <circle cx="102" cy="236" r="2" fill="#F8FAFC"/>
+
+  <rect x="126" y="228" width="28" height="16" rx="4" fill="#334155"/>
+  <circle cx="140" cy="236" r="2" fill="#F8FAFC"/>
+
+  <rect x="164" y="228" width="28" height="16" rx="4" fill="#10B981"/> <!-- Giriş / Yeşil -->
+
+  <!-- Satır 4 -->
+  <rect x="88" y="249" width="28" height="16" rx="4" fill="#1E293B"/>
+  <rect x="126" y="249" width="28" height="16" rx="4" fill="#334155"/>
+  <circle cx="140" cy="257" r="2" fill="#F8FAFC"/>
+  <rect x="164" y="249" width="28" height="16" rx="4" fill="#FFC20E"/> <!-- Fonksiyon Tuşu -->
+
+  <!-- 7. Alt Kart Okuyucu Yuvası -->
+  <rect x="90" y="273" width="100" height="4" rx="2" fill="#020617"/>
+
+  <!-- 8. Yuvaya Takılı Banka Kartı -->
+  <g transform="translate(0, 8)">
+    <!-- Kart Gövdesi -->
+    <rect x="105" y="270" width="70" height="34" rx="5" fill="#1E293B" stroke="#FFC20E" stroke-width="1.2"/>
+    <!-- Manyetik Şerit -->
+    <rect x="105" y="277" width="70" height="6" fill="#020617"/>
+    <!-- Çip -->
+    <rect x="113" y="287" width="10" height="8" rx="2" fill="#FFC20E"/>
+  </g>
+</svg>

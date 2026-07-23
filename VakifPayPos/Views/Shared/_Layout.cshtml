@@ -31,8 +31,11 @@
                 </div>
             </a>
 
-            <!-- SAĞ SEPET BUTONU -->
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-3">
+                <a href="/Home/AddPos" class="bg-[#0F172A] hover:bg-slate-800 text-[#FFC20E] text-xs font-extrabold px-3.5 py-2.5 rounded-xl border border-[#FFC20E]/20 transition-all shadow-sm flex items-center space-x-1.5">
+                    <i class="fa-solid fa-plus"></i>
+                    <span class="hidden sm:inline">Cihaz Ekle</span>
+                </a>
                 <button onclick="toggleCartModal()" class="relative p-2.5 text-[#0F172A] hover:text-[#FFC20E] hover:bg-[#0F172A] transition-all focus:outline-none bg-slate-100 rounded-xl">
                     <i class="fa-solid fa-basket-shopping text-xl"></i>
                     <span id="cart-badge" class="absolute -top-1 -right-1 bg-[#FFC20E] text-[#0F172A] text-[11px] font-extrabold rounded-full w-5 h-5 flex items-center justify-center shadow border-2 border-white hidden">0</span>
@@ -46,7 +49,7 @@
     </main>
 
     <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400">
-        <p>&copy; 2026 VakıfPayPos - Türkiye Vakıflar Bankası T.A.O.</p>
+        <p>&copy; 2026 VakıfPayPos - Türkiye Vakıflar Bankası T.A.O. - All Rights Reserved - Poyraz Pala</p>
     </footer>
 
     <!-- SEPET MODALI -->
@@ -56,7 +59,7 @@
                 <h3 class="text-base font-bold text-[#0F172A]">Alışveriş Sepeti</h3>
                 <button onclick="toggleCartModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div class="p-6 space-y-4 max-h-96 overflow-y-auto" id="cart-items-wrapper"></div>
+            <div class="p-6 space-y-3 max-h-96 overflow-y-auto" id="cart-items-wrapper"></div>
             <div id="cart-footer" class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between hidden">
                 <div>
                     <span class="text-[10px] text-slate-400 block font-bold">Toplam Tutar</span>
@@ -72,24 +75,41 @@
 
     <!-- YARDIMCI SEPET SCRIPT'İ -->
     <script>
-        function getCart() { return JSON.parse(localStorage.getItem('vakif_cart') || '[]'); }
-        function saveCart(cart) { localStorage.setItem('vakif_cart', JSON.stringify(cart)); updateCartUI(); }
+        function getCart() { 
+            try {
+                return JSON.parse(localStorage.getItem('vakif_cart') || '[]'); 
+            } catch(e) {
+                return [];
+            }
+        }
 
-        function addToCart(id, name, price, rate) {
+        function saveCart(cart) { 
+            localStorage.setItem('vakif_cart', JSON.stringify(cart)); 
+            updateCartUI(); 
+        }
+
+        function addToCart(id, name, price, rate, image = '') {
             let cart = getCart();
-            let item = cart.find(x => x.id === id);
-            if (item) { item.quantity++; } 
-            else { cart.push({ id, name, price, rate, quantity: 1 }); }
+            let item = cart.find(x => x && x.id === id);
+            
+            const safeName = (name || 'POS Cihazı').toString();
+            const safeImg = (image && typeof image === 'string' && image.trim() !== '') ? image : '/img/sabit-pos.svg';
+
+            if (item) { 
+                item.quantity = (item.quantity || 0) + 1; 
+            } else { 
+                cart.push({ id: id, name: safeName, price: price || 0, rate: rate || 0, image: safeImg, quantity: 1 }); 
+            }
             saveCart(cart);
-            showToast(`${name} sepetinize eklendi!`, "success");
+            showToast(`${safeName} sepetinize eklendi!`, "success");
         }
 
         function removeOneFromCart(id) {
             let cart = getCart();
-            let item = cart.find(x => x.id === id);
+            let item = cart.find(x => x && x.id === id);
             if (item) {
                 item.quantity--;
-                if (item.quantity <= 0) cart = cart.filter(x => x.id !== id);
+                if (item.quantity <= 0) cart = cart.filter(x => x && x.id !== id);
             }
             saveCart(cart);
         }
@@ -97,49 +117,83 @@
         function toggleCartModal() { document.getElementById('cart-modal').classList.toggle('hidden'); }
 
         function updateCartUI() {
-            const cart = getCart();
-            const wrapper = document.getElementById('cart-items-wrapper');
-            const badge = document.getElementById('cart-badge');
-            const footer = document.getElementById('cart-footer');
-            const totalPriceEl = document.getElementById('cart-total-price');
+            try {
+                const cart = getCart();
+                const wrapper = document.getElementById('cart-items-wrapper');
+                const badge = document.getElementById('cart-badge');
+                const footer = document.getElementById('cart-footer');
+                const totalPriceEl = document.getElementById('cart-total-price');
 
-            const totalQty = cart.reduce((a, b) => a + b.quantity, 0);
-            if (totalQty > 0) {
-                badge.innerText = totalQty;
-                badge.classList.remove('hidden');
-                footer.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-                footer.classList.add('hidden');
-                wrapper.innerHTML = `<p class="text-center text-slate-400 text-sm py-4">Sepetiniz boş.</p>`;
-                return;
-            }
+                if (!wrapper || !badge || !footer) return;
 
-            let html = '';
-            let grandTotal = 0;
-            cart.forEach(item => {
-                const subtotal = item.price * item.quantity;
-                grandTotal += subtotal;
-                html += `
-                    <div class="flex items-center justify-between bg-slate-50 p-3 rounded-lg border text-xs">
-                        <div>
-                            <h4 class="font-extrabold text-[#0F172A]">${item.name}</h4>
-                            <p class="text-slate-400 text-[10px]">Komisyon: %${item.rate}</p>
-                            <div class="flex items-center space-x-2 pt-1">
-                                <button onclick="removeOneFromCart(${item.id})" class="bg-white border px-1.5 rounded"><i class="fa-solid fa-minus"></i></button>
-                                <span class="font-bold">${item.quantity}</span>
-                                <button onclick="addToCart(${item.id}, '${item.name}', ${item.price}, ${item.rate})" class="bg-white border px-1.5 rounded"><i class="fa-solid fa-plus"></i></button>
+                // Bozuk/null objeleri ayıkla
+                const validCart = cart.filter(x => x && x.id);
+
+                const totalQty = validCart.reduce((a, b) => a + (Number(b.quantity) || 0), 0);
+
+                if (totalQty > 0) {
+                    badge.innerText = totalQty;
+                    badge.classList.remove('hidden');
+                    footer.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                    footer.classList.add('hidden');
+                    wrapper.innerHTML = `<p class="text-center text-slate-400 text-sm py-4">Sepetiniz boş.</p>`;
+                    return;
+                }
+
+                let html = '';
+                let grandTotal = 0;
+
+                validCart.forEach(item => {
+                    const qty = Number(item.quantity) || 1;
+                    const price = Number(item.price) || 0;
+                    const rate = item.rate !== undefined ? item.rate : 0;
+                    const subtotal = price * qty;
+                    grandTotal += subtotal;
+
+                    const nameStr = (item.name || 'POS Cihazı').toString().replace(/'/g, "\\'");
+                    const imgPath = (item.image && typeof item.image === 'string' && item.image.trim() !== '') ? item.image : '/img/sabit-pos.svg';
+
+                    html += `
+                        <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200/80 text-xs shadow-sm">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-white rounded-lg border border-slate-200 p-1 flex items-center justify-center flex-shrink-0 shadow-inner">
+                                    <img src="${imgPath}" alt="${nameStr}" class="max-h-full max-w-full object-contain">
+                                </div>
+
+                                <div>
+                                    <h4 class="font-extrabold text-[#0F172A] line-clamp-1">${item.name || 'POS Cihazı'}</h4>
+                                    <p class="text-slate-400 text-[10px]">Komisyon: %${rate}</p>
+                                    <div class="flex items-center space-x-2 pt-1">
+                                        <button onclick="removeOneFromCart(${item.id})" class="bg-white hover:bg-slate-100 border px-2 py-0.5 rounded text-slate-600 transition-colors"><i class="fa-solid fa-minus text-[9px]"></i></button>
+                                        <span class="font-bold text-[#0F172A] px-1">${qty}</span>
+                                        <button onclick="addToCart(${item.id}, '${nameStr}', ${price}, ${rate}, '${imgPath}')" class="bg-white hover:bg-slate-100 border px-2 py-0.5 rounded text-slate-600 transition-colors"><i class="fa-solid fa-plus text-[9px]"></i></button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <span class="font-bold text-[#0F172A]">${subtotal.toLocaleString('tr-TR')} TL</span>
-                    </div>`;
-            });
-            wrapper.innerHTML = html;
-            totalPriceEl.innerText = grandTotal.toLocaleString('tr-TR') + " TL";
+                            <span class="font-extrabold text-[#0F172A] pl-2">${subtotal.toLocaleString('tr-TR')} TL</span>
+                        </div>`;
+                });
+
+                wrapper.innerHTML = html;
+                if (totalPriceEl) totalPriceEl.innerText = grandTotal.toLocaleString('tr-TR') + " TL";
+
+            } catch (err) {
+                console.error("Sepet hatası yakalandı:", err);
+                // Olası bir patlamada sepeti güvenle sıfırla
+                localStorage.removeItem('vakif_cart');
+                document.getElementById('cart-badge')?.classList.add('hidden');
+                document.getElementById('cart-footer')?.classList.add('hidden');
+                if (document.getElementById('cart-items-wrapper')) {
+                    document.getElementById('cart-items-wrapper').innerHTML = `<p class="text-center text-slate-400 text-sm py-4">Sepetiniz yenilendi.</p>`;
+                }
+            }
         }
 
         function showToast(msg, type = 'info') {
             const container = document.getElementById('toast-container');
+            if (!container) return;
             const toast = document.createElement('div');
             toast.className = `p-3 rounded-xl shadow-lg border text-xs font-bold bg-amber-50 text-amber-900 border-[#FFC20E]/40 pointer-events-auto`;
             toast.innerHTML = `<i class="fa-solid fa-circle-info mr-1 text-[#FFC20E]"></i> ${msg}`;

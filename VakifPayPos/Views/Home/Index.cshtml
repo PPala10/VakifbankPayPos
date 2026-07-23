@@ -6,6 +6,7 @@
 }
 
 <div class="space-y-8">
+    <!-- Başlık / Banner Alanı -->
     <div class="text-center max-w-2xl mx-auto space-y-3">
         <span class="bg-[#FFC20E]/15 text-[#0F172A] text-xs font-extrabold px-3 py-1 rounded-full border border-[#FFC20E]/30 uppercase">VakıfPayPos Ürün Portföyü</span>
         <h1 class="text-3xl font-extrabold tracking-tight text-[#0F172A] sm:text-4xl">Yeni Nesil Fiziki POS Modelleri</h1>
@@ -13,30 +14,55 @@
     </div>
 
     <!-- Ürün Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
     @if (Model != null && Model.Any())
     {
         @foreach (var pos in Model)
         {
-            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
-                <div class="p-6">
-                    <div class="h-32 w-full bg-slate-50 rounded-xl flex items-center justify-center mb-4 border border-slate-100 p-4">
-                        <i class="fa-solid fa-credit-card text-4xl text-[#0F172A]"></i>
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between group relative">
+                
+                <!-- SİLME BUTONU (Sağ Üst Köşe) -->
+                <form asp-controller="Home" asp-action="Delete" asp-route-id="@pos.posID" method="post" onsubmit="return confirm('@pos.posName cihazını silmek istediğinize emin misiniz?');" class="absolute top-3 right-3 z-10">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" title="Cihazı Sil" class="w-8 h-8 rounded-full bg-white/80 hover:bg-red-500 text-slate-400 hover:text-white border border-slate-200 hover:border-red-500 flex items-center justify-center transition-all shadow-sm">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </form>
+
+                <div class="p-5">
+                    <div class="h-44 w-full bg-slate-50/60 rounded-xl flex items-center justify-center p-3 mb-4 border border-slate-100 overflow-hidden group-hover:bg-white transition-colors">
+                        <img src="@pos.GetDisplayImage()" alt="@pos.posName" class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-sm">    
                     </div>
-                    <span class="text-[10px] font-extrabold text-[#0F172A] bg-amber-100 px-2 py-0.5 rounded-full border border-[#FFC20E]/50">@pos.posType.ToUpper()</span>
-                    <h3 class="text-base font-bold text-slate-900 mt-2">@pos.posName</h3>
-                    <p class="text-slate-500 text-xs line-clamp-2 mt-1">@pos.description</p>
-                    <div class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 gap-2 text-[11px]">
+
+                    <!-- Kategori Rozeti -->
+                    <span class="text-[10px] font-extrabold text-[#0F172A] bg-amber-100 px-2.5 py-0.5 rounded-full border border-[#FFC20E]/50 uppercase tracking-wider">
+                        @pos.posType
+                    </span>
+
+                    <!-- Cihaz Adı -->
+                    <h3 class="text-base font-extrabold text-[#0F172A] mt-2 line-clamp-1 group-hover:text-amber-600 transition-colors">
+                        @pos.posName
+                    </h3>
+
+                    <!-- Açıklama -->
+                    <p class="text-slate-500 text-xs line-clamp-2 mt-1 min-h-[32px]">
+                        @pos.description
+                    </p>
+
+                    <!-- Detay Özellikler -->
+                    <div class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-[11px]">
                         <div class="text-slate-500">Komisyon: <span class="text-slate-800 font-bold">%@pos.commisionRate</span></div>
                         <div class="text-slate-500">Valör: <span class="text-slate-800 font-bold">@pos.valorType</span></div>
                     </div>
                 </div>
-                <div class="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+
+                <!-- Alt Fiyat ve Sepet Alanı -->
+                <div class="p-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between mt-auto">
                     <div>
                         <span class="text-[10px] text-slate-400 block font-semibold">@pos.priceType</span>
                         <span class="text-base font-bold text-[#0F172A]">@pos.price.ToString("N0") TL</span>
                     </div>
-                    <button onclick="addToCart(@pos.posID, '@pos.posName', @pos.price, @pos.commisionRate)" class="bg-[#0F172A] hover:bg-slate-800 text-[#FFC20E] text-[11px] font-extrabold px-3.5 py-2.5 rounded-xl transition-all shadow-sm">
+                    <button onclick="addToCart(@pos.posID, '@pos.posName', @pos.price, @pos.commisionRate, '@pos.GetDisplayImage()')" class="bg-[#0F172A] hover:bg-slate-800 text-[#FFC20E] text-[11px] font-extrabold px-3.5 py-2.5 rounded-xl transition-all shadow-sm active:scale-95">
                         Sepete Ekle
                     </button>
                 </div>
@@ -45,8 +71,13 @@
     }
     else
     {
-        <div class="col-span-4 text-center py-12 bg-white rounded-2xl border">
+        <div class="col-span-4 text-center py-16 bg-white rounded-2xl border border-dashed border-slate-300 space-y-3">
+            <i class="fa-solid fa-box-open text-4xl text-slate-300"></i>
             <p class="text-slate-500 font-bold">Henüz veritabanında tanımlı POS cihazı bulunamadı.</p>
+            <a href="/Home/AddPos" class="inline-block bg-[#0F172A] text-[#FFC20E] text-xs font-bold px-4 py-2 rounded-lg">
+                + İlk POS Cihazını Ekle
+            </a>
         </div>
     }   
+    </div>
 </div>

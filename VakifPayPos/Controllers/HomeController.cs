@@ -31,4 +31,35 @@ public class HomeController : Controller
         return View();
     }
 
+    [HttpGet]
+    public IActionResult AddPos()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddPos(Pos pos)
+    {
+        pos.createDate = DateTime.UtcNow;
+        pos.updateDate = DateTime.UtcNow;
+        pos.isActive = true;
+
+        _context.Pos.Add(pos); 
+        await _context.SaveChangesAsync();
+
+        TempData["SuccessMessage"] = "POS cihazı başarıyla eklendi.";
+        return RedirectToAction("Index");
+    }
+
+    [HttpPost]
+    public IActionResult Delete(int id)
+    {
+        var pos = _context.Pos.FirstOrDefault(p => p.posID == id);
+
+        _context.Pos.Remove(pos);
+        _context.SaveChanges();
+        TempData["SuccessMessage"] = "POS cihazı başarıyla silindi.";
+        
+        return RedirectToAction(nameof(Index));
+    }
 }
